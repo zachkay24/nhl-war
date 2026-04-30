@@ -927,7 +927,7 @@ function renderSkaterCard(p) {
   return `
     <div class="player-card">
       <div class="card-header">
-        <div class="avatar" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[p.team]||'0077b6,00b4d8').split(',')[0]},${'#'+(TEAM_BG[p.team]||'0077b6,00b4d8').split(',')[1]})"><img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.75);transform-origin:50% 22%" onerror="this.style.display='none'"></div>
+        <div class="avatar" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[p.team]||'0077b6,00b4d8').split(',')[0]},${'#'+(TEAM_BG[p.team]||'0077b6,00b4d8').split(',')[1]})"><img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.60);transform-origin:50% 22%" onerror="this.style.display='none'"></div>
         <div class="player-info">
           <h2>${p.name}</h2>
           <div class="player-meta">
@@ -1041,7 +1041,7 @@ function renderGoalieCard(p) {
   return `
     <div class="player-card">
       <div class="card-header">
-        <div class="avatar goalie" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[p.team]||'6a0dad,9b59b6').split(',')[0]},${'#'+(TEAM_BG[p.team]||'6a0dad,9b59b6').split(',')[1]})"><img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.75);transform-origin:50% 22%" onerror="this.style.display='none'"></div>
+        <div class="avatar goalie" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[p.team]||'6a0dad,9b59b6').split(',')[0]},${'#'+(TEAM_BG[p.team]||'6a0dad,9b59b6').split(',')[1]})"><img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.60);transform-origin:50% 22%" onerror="this.style.display='none'"></div>
         <div class="player-info">
           <h2>${p.name}</h2>
           <div class="player-meta">
