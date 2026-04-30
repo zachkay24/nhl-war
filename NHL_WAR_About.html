@@ -154,6 +154,7 @@
 </div>
 
 <nav class="site-nav">
+  <a href="index.html">Home</a>
   <a href="NHL_WAR_Cards.html">Players</a>
   <a href="NHL_WAR_Teams.html">Teams</a>
   <a href="NHL_WAR_Lines.html">Lines</a>
@@ -599,6 +600,78 @@ PK replacement level = league average PK xGA allowed rate
 
   </div><!-- /content -->
 </div><!-- /page-wrap -->
+
+
+<script>
+/* ── NHL WAR Team Theme Injection ── */
+(function(){
+  var TC={'ANA':['F47A38','B9975B'],'BOS':['FFB81C','1a1a1a'],'BUF':['003087','FCB514'],'CAR':['CC0000','000000'],'CBJ':['002654','CE1126'],'CGY':['C8102E','F1BE48'],'CHI':['CF0A2C','000000'],'COL':['6F263D','236192'],'DAL':['006847','8F8F8C'],'DET':['CE1126','FFFFFF'],'EDM':['FF4C00','041E42'],'FLA':['041E42','C8102E'],'LAK':['A2AAAD','111111'],'MIN':['A6192E','154734'],'MTL':['AF1E2D','192168'],'NJD':['CE1126','000000'],'NSH':['FFB81C','041E42'],'NYI':['00539B','F47D30'],'NYR':['0038A8','CE1126'],'OTT':['C52032','C69214'],'PHI':['F74902','000000'],'PIT':['CFC493','000000'],'SEA':['99D9D9','001628'],'SJS':['006D75','EA7200'],'STL':['002F87','FCB514'],'TBL':['002868','FFFFFF'],'TOR':['00205B','FFFFFF'],'UTA':['69B3E7','1C1C1C'],'VAN':['00205B','009639'],'VGK':['B4975A','333F48'],'WPG':['041E42','004C97'],'WSH':['C8102E','041E42']};
+  var ABBRS=new Set(Object.keys(TC));
+
+  function hex(h){
+    var r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);
+    return r+','+g+','+b;
+  }
+
+  function styleEl(el){
+    var abbr=(el.textContent||'').trim().toUpperCase();
+    if(!ABBRS.has(abbr))return;
+    var c=TC[abbr], p=c[0], s=c[1];
+    // Check if it's an avatar (circular team logo holder on Teams page)
+    if(el.classList.contains('avatar')){
+      el.style.background='linear-gradient(135deg,#'+p+',#'+s+')';
+      el.style.color='#fff';
+      el.innerHTML='<img src="https://assets.nhle.com/logos/nhl/svg/'+abbr+'_light.svg" '+
+        'style="width:62%;height:62%;object-fit:contain;display:block;" '+
+        'onerror="this.style.display='none'">';
+      return;
+    }
+    // Team badge (meta-b pill)
+    if(el.classList.contains('meta-b')&&!el.classList.contains('pos')){
+      el.style.background='rgba('+hex(p)+',0.15)';
+      el.style.borderColor='rgba('+hex(p)+',0.5)';
+      el.style.color='#'+p;
+      return;
+    }
+    // Plain team cell in table (td containing only the abbr)
+    if(el.tagName==='TD'&&el.textContent.trim()===abbr){
+      el.style.fontWeight='700';
+      el.style.color='#'+p;
+      return;
+    }
+    // .team-sub div under player name in leaderboard
+    if(el.classList.contains('team-sub')){
+      el.style.color='#'+p;
+      el.style.fontWeight='600';
+    }
+  }
+
+  function applyAll(root){
+    (root||document).querySelectorAll(
+      '.avatar,.meta-b,td.sc4,td.sc2,.team-sub,.team-t'
+    ).forEach(styleEl);
+  }
+
+  function onReady(){
+    applyAll();
+    new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        m.addedNodes.forEach(function(n){
+          if(n.nodeType!==1)return;
+          styleEl(n);
+          n.querySelectorAll('.avatar,.meta-b,td.sc4,td.sc2,.team-sub,.team-t').forEach(styleEl);
+        });
+      });
+    }).observe(document.body,{childList:true,subtree:true});
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',onReady);
+  }else{
+    onReady();
+  }
+})();
+</script>
 
 </body>
 </html>
