@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHL WAR – Home</title>
+<style>
+  :root {
+    --bg:      #0a0e1a;
+    --surf:    #111827;
+    --surf2:   #1e2a3a;
+    --border:  #2a3a50;
+    --accent:  #00b4d8;
+    --accent2: #0077b6;
+    --gold:    #f4a261;
+    --red:     #e63946;
+    --green:   #2dc653;
+    --muted:   #64748b;
+    --text:    #e2e8f0;
+    --text2:   #94a3b8;
+    --r:       12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh; padding: 0 0 64px;
+  }
+
+  /* ── Nav ── */
+  .site-nav {
+    display: flex; justify-content: center; gap: 6px;
+    padding: 24px 16px 0; flex-wrap: wrap;
+  }
+  .site-nav a {
+    padding: 8px 22px; border-radius: 50px;
+    border: 1px solid var(--border); background: var(--surf);
+    color: var(--text2); font-size: 0.85rem; font-weight: 600;
+    text-decoration: none; transition: all 0.15s;
+  }
+  .site-nav a:hover { border-color: var(--accent); color: var(--accent); }
+  .site-nav a.active { background: var(--accent2); border-color: var(--accent); color: #fff; }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    padding: 56px 16px 48px;
+    background: radial-gradient(ellipse at top, rgba(0,119,182,0.18) 0%, transparent 65%);
+  }
+  .hero-badge {
+    display: inline-block;
+    padding: 4px 14px; border-radius: 20px;
+    border: 1px solid var(--accent2); background: rgba(0,119,182,0.15);
+    color: var(--accent); font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: clamp(2.8rem, 8vw, 5rem);
+    font-weight: 900; letter-spacing: -1.5px; line-height: 1;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    margin-top: 14px; color: var(--text2);
+    font-size: 1.05rem; max-width: 480px; margin-left: auto; margin-right: auto;
+    line-height: 1.55;
+  }
+
+  /* ── Section titles ── */
+  .section-label {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 12px;
+    max-width: 900px; margin: 0 auto 24px; padding: 0 16px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── Current season ── */
+  .current-wrap {
+    max-width: 900px; margin: 0 auto; padding: 0 16px 48px;
+  }
+  .current-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .main-card {
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 24px 22px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.18s; display: block;
+    position: relative; overflow: hidden;
+  }
+  .main-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,180,216,0.06), transparent);
+    opacity: 0; transition: opacity 0.18s;
+  }
+  .main-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,180,216,0.12); }
+  .main-card:hover::before { opacity: 1; }
+  .card-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 14px;
+    background: rgba(0,119,182,0.2); border: 1px solid rgba(0,180,216,0.25);
+  }
+  .main-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .main-card p { color: var(--text2); font-size: 0.85rem; line-height: 1.5; }
+  .card-arrow {
+    position: absolute; bottom: 20px; right: 20px;
+    color: var(--accent); font-size: 1rem; opacity: 0;
+    transition: opacity 0.18s, transform 0.18s;
+  }
+  .main-card:hover .card-arrow { opacity: 1; transform: translateX(3px); }
+
+  /* About card gets gold accent */
+  .main-card.about .card-icon { background: rgba(244,162,97,0.15); border-color: rgba(244,162,97,0.3); }
+  .main-card.about:hover { border-color: var(--gold); box-shadow: 0 8px 24px rgba(244,162,97,0.1); }
+  .main-card.about:hover .card-arrow { color: var(--gold); }
+
+  /* ── Archive ── */
+  .archive-wrap {
+    max-width: 900px; margin: 0 auto; padding: 0 16px;
+  }
+  .season-list {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .season-row {
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 14px 18px;
+    display: flex; align-items: center; gap: 16px;
+    transition: border-color 0.15s;
+  }
+  .season-row:hover { border-color: var(--border); }
+  .season-year {
+    font-size: 0.95rem; font-weight: 700; color: var(--text);
+    min-width: 72px;
+  }
+  .season-links {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .season-links a {
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surf2);
+    color: var(--text2); font-size: 0.8rem; font-weight: 600;
+    text-decoration: none; transition: all 0.13s;
+  }
+  .season-links a:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,180,216,0.08); }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center; color: var(--muted);
+    font-size: 0.8rem; padding: 48px 16px 0;
+    line-height: 1.7;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="active">Home</a>
+  <a href="NHL_WAR_Cards.html">Players</a>
+  <a href="NHL_WAR_Teams.html">Teams</a>
+  <a href="NHL_WAR_Lines.html">Lines</a>
+  <a href="NHL_WAR_About.html">About</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">Independent Hockey Analytics</div>
+  <h1>NHL WAR</h1>
+  <p class="hero-sub">Wins Above Replacement for every NHL skater and goalie — player cards, line combinations, and team breakdowns from 2008 to today.</p>
+</section>
+
+<!-- Current Season -->
+<div class="current-wrap">
+  <div class="section-label">2025–26 Season</div>
+  <div class="current-grid">
+
+    <a class="main-card" href="NHL_WAR_Cards.html">
+      <div class="card-icon">🏒</div>
+      <h3>Player Cards</h3>
+      <p>WAR breakdowns for every current-season skater and goalie, with percentile comparisons.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="main-card" href="NHL_WAR_Teams.html">
+      <div class="card-icon">🏆</div>
+      <h3>Team Rankings</h3>
+      <p>Roster-level WAR totals and team-by-team breakdowns across all 32 NHL franchises.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="main-card" href="NHL_WAR_Lines.html">
+      <div class="card-icon">📊</div>
+      <h3>Line Combinations</h3>
+      <p>WAR contributions by forward line and defensive pairing across the league.</p>
+      <span class="card-arrow">→</span>
+    </a>
+
+    <a class="main-card about" href="NHL_WAR_About.html">
+      <div class="card-icon">📖</div>
+      <h3>Methodology</h3>
+      <p>How WAR is calculated — components, weights, and glossary of every metric used.</p>
+      <span class="card-arrow" style="color:var(--gold)">→</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- Archive -->
+<div class="archive-wrap">
+  <div class="section-label">Historical Seasons</div>
+  <div class="season-list">
+
+    <div class="season-row">
+      <span class="season-year">2024–25</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2024-25.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2024-25.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2024-25.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2023–24</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2023-24.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2023-24.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2023-24.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2022–23</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2022-23.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2022-23.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2022-23.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2021–22</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2021-22.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2021-22.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2021-22.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2020–21</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2020-21.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2020-21.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2020-21.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2019–20</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2019-20.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2019-20.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2019-20.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2018–19</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2018-19.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2018-19.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2018-19.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2017–18</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2017-18.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2017-18.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2017-18.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2016–17</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2016-17.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2016-17.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2016-17.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2015–16</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2015-16.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2015-16.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2015-16.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2014–15</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2014-15.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2014-15.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2014-15.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2013–14</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2013-14.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2013-14.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2013-14.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2012–13</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2012-13.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2012-13.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2012-13.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2011–12</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2011-12.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2011-12.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2011-12.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2010–11</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2010-11.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2010-11.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2010-11.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2009–10</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2009-10.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2009-10.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2009-10.html">Lines</a>
+      </div>
+    </div>
+
+    <div class="season-row">
+      <span class="season-year">2008–09</span>
+      <div class="season-links">
+        <a href="Old Seasons/NHL_WAR_Cards_2008-09.html">Players</a>
+        <a href="Old Seasons/NHL_WAR_Teams_2008-09.html">Teams</a>
+        <a href="Old Seasons/NHL_WAR_Lines_2008-09.html">Lines</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  Built with publicly available NHL data &nbsp;·&nbsp; <a href="NHL_WAR_About.html">Methodology</a>
+</footer>
+
+</body>
+</html>

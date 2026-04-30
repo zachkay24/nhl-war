@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHL WAR – Methodology & Glossary</title>
+<style>
+  :root {
+    --bg:     #0a0e1a; --surf:   #111827; --surf2:  #1e2a3a;
+    --border: #2a3a50; --accent: #00b4d8; --accent2:#0077b6;
+    --gold:   #f4a261; --red:    #e63946; --green:  #2dc653;
+    --muted:  #64748b; --text:   #e2e8f0; --text2:  #94a3b8; --r: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh; padding: 24px 16px 64px;
+  }
+
+  /* Nav */
+  .site-nav {
+    display: flex; justify-content: center; gap: 6px;
+    margin: 0 auto 36px; max-width: 600px; flex-wrap: wrap;
+  }
+  .site-nav a {
+    padding: 8px 20px; border-radius: 50px;
+    border: 1px solid var(--border); background: var(--surf);
+    color: var(--text2); font-size: 0.85rem; font-weight: 600;
+    text-decoration: none; transition: all 0.15s;
+  }
+  .site-nav a:hover { border-color: var(--accent); color: var(--accent); }
+  .site-nav a.active { background: var(--accent2); border-color: var(--accent); color: #fff; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 28px; }
+  .header h1 {
+    font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .header p { color: var(--text2); margin-top: 6px; font-size: 0.9rem; }
+
+  /* Layout */
+  .page-wrap {
+    max-width: 860px; margin: 0 auto;
+    display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start;
+  }
+
+  /* Sticky TOC */
+  .toc {
+    position: sticky; top: 24px;
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 20px;
+  }
+  .toc h3 {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text2); margin-bottom: 14px; font-weight: 700;
+  }
+  .toc a {
+    display: block; padding: 5px 0; color: var(--text2);
+    font-size: 0.84rem; text-decoration: none; transition: color 0.15s;
+    border-left: 2px solid transparent; padding-left: 10px;
+  }
+  .toc a:hover { color: var(--accent); border-color: var(--accent); }
+  .toc a.sub { padding-left: 20px; font-size: 0.8rem; color: var(--muted); }
+  .toc a.sub:hover { color: var(--accent); border-color: var(--accent); }
+  .toc-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+  /* Content */
+  .content { min-width: 0; }
+
+  /* Section card */
+  .section {
+    background: var(--surf); border: 1px solid var(--border);
+    border-radius: var(--r); margin-bottom: 20px; overflow: hidden;
+  }
+  .section-title {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-title .icon {
+    font-size: 1.4rem; width: 40px; height: 40px;
+    background: var(--surf2); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .section-title h2 { font-size: 1.15rem; font-weight: 800; }
+  .section-title p { color: var(--text2); font-size: 0.82rem; margin-top: 3px; }
+  .section-body { padding: 20px 24px; }
+
+  /* Stat entries */
+  .stat-entry { margin-bottom: 22px; }
+  .stat-entry:last-child { margin-bottom: 0; }
+  .stat-name {
+    font-size: 0.95rem; font-weight: 700; color: var(--accent);
+    margin-bottom: 5px; display: flex; align-items: center; gap: 8px;
+  }
+  .stat-name .tag {
+    font-size: 0.68rem; font-weight: 700; padding: 2px 8px;
+    border-radius: 4px; background: rgba(0,180,216,0.12);
+    color: var(--accent); letter-spacing: 0.5px;
+  }
+  .stat-name .tag.gold { background: rgba(244,162,97,0.12); color: var(--gold); }
+  .stat-name .tag.green { background: rgba(45,198,83,0.12); color: var(--green); }
+  .stat-desc { color: var(--text2); font-size: 0.87rem; line-height: 1.65; }
+  .stat-desc strong { color: var(--text); font-weight: 600; }
+
+  /* Formula box */
+  .formula {
+    margin: 10px 0 0; padding: 12px 16px;
+    background: var(--surf2); border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    font-family: 'Courier New', monospace; font-size: 0.82rem;
+    color: var(--text); line-height: 1.6;
+  }
+  .formula .comment { color: var(--muted); }
+
+  /* Divider between entries */
+  .entry-divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+  /* Info callout */
+  .callout {
+    padding: 14px 16px; border-radius: 8px; margin: 14px 0;
+    font-size: 0.84rem; line-height: 1.6;
+  }
+  .callout.info  { background: rgba(0,180,216,0.08); border: 1px solid rgba(0,180,216,0.2); color: var(--text2); }
+  .callout.note  { background: rgba(244,162,97,0.08); border: 1px solid rgba(244,162,97,0.2); color: var(--text2); }
+  .callout strong { color: var(--text); }
+
+  /* Glossary table */
+  .gloss-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .gloss-table th {
+    text-align: left; padding: 8px 12px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--text2); border-bottom: 2px solid var(--border);
+    font-weight: 700;
+  }
+  .gloss-table td { padding: 9px 12px; border-bottom: 1px solid rgba(42,58,80,0.4); color: var(--text2); vertical-align: top; }
+  .gloss-table td:first-child { font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .gloss-table tbody tr:last-child td { border-bottom: none; }
+  .gloss-table tbody tr:hover td { background: rgba(0,180,216,0.04); }
+
+  @media (max-width: 680px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .toc { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📖 Methodology &amp; Glossary</h1>
+  <p>How every stat on this site is defined and calculated</p>
+</div>
+
+<nav class="site-nav">
+  <a href="NHL_WAR_Cards.html">Players</a>
+  <a href="NHL_WAR_Teams.html">Teams</a>
+  <a href="NHL_WAR_Lines.html">Lines</a>
+  <a href="NHL_WAR_About.html" class="active">About</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- ═══ TOC ═══ -->
+  <aside class="toc">
+    <h3>On this page</h3>
+    <a href="#war-overview">What is WAR?</a>
+    <a href="#war-components">WAR Components</a>
+    <a href="#ev-offense"   class="sub">EV Offense WAR</a>
+    <a href="#ev-defense"   class="sub">EV Defense WAR</a>
+    <a href="#pp-war"       class="sub">Power Play WAR</a>
+    <a href="#pk-war"       class="sub">Penalty Kill WAR</a>
+    <a href="#finishing"    class="sub">Finishing WAR</a>
+    <a href="#goalie-war"   class="sub">Goalie WAR</a>
+    <a href="#war82"        class="sub">WAR / 82</a>
+    <hr class="toc-divider">
+    <a href="#percentiles">Percentile Ranks</a>
+    <a href="#replacement">Replacement Level</a>
+    <hr class="toc-divider">
+    <a href="#possession">Possession Stats</a>
+    <a href="#team-stats">Team Stats</a>
+    <a href="#lines-stats">Lines Stats</a>
+    <hr class="toc-divider">
+    <a href="#glossary">Full Glossary</a>
+  </aside>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div class="content">
+
+    <!-- WAR Overview -->
+    <div class="section" id="war-overview">
+      <div class="section-title">
+        <div class="icon">🏆</div>
+        <div>
+          <h2>What is WAR?</h2>
+          <p>Wins Above Replacement — the core metric</p>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="stat-desc">
+          <strong>WAR (Wins Above Replacement)</strong> measures how many wins a player adds to their team compared to a freely available replacement-level player — someone you could call up from the minors or sign off the waiver wire. It converts all on-ice production into a single number on the wins scale.
+        </div>
+        <div class="callout info" style="margin-top:14px;">
+          <strong>The core conversion:</strong> In hockey, roughly <strong>6 goals</strong> separate a playoff team from a replacement-level team over a full season. So throughout this model, <strong>1 WAR = 6 Goals Above Replacement (GAR)</strong>.
+        </div>
+        <div class="stat-desc" style="margin-top:14px;">
+          A player with <strong>+3.0 WAR</strong> is estimated to have contributed 3 more wins than a replacement player in the same role and ice time. The league average full-time NHLer typically sits around +1–2 WAR; elite players reach +6–10; replacement level is near 0.
+        </div>
+        <div class="callout note" style="margin-top:14px;">
+          <strong>Note on data:</strong> All underlying stats (xGoals, ice time, Corsi, etc.) come from <strong>Natural Stat Trick</strong>. This model uses the 2025-26 season CSV exports.
+        </div>
+      </div>
+    </div>
+
+    <!-- WAR Components -->
+    <div class="section" id="war-components">
+      <div class="section-title">
+        <div class="icon">⚙️</div>
+        <div>
+          <h2>WAR Components</h2>
+          <p>Total WAR = EV Offense + EV Defense + PP + PK + Finishing</p>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <!-- EV Offense -->
+        <div class="stat-entry" id="ev-offense">
+          <div class="stat-name">EV Offense WAR <span class="tag">5-on-5</span></div>
+          <div class="stat-desc">
+            Measures a player's individual offensive contribution at even strength relative to a replacement-level player. It combines expected goals with playmaking (weighted assists) to capture both shooting and setup.
+          </div>
+          <div class="formula">
+iOff60 = (xGoals + 0.75 × PrimaryAssists + 0.5 × SecondaryAssists) / icetime_hours × 60
+<span class="comment">-- Individual offensive rate per 60 minutes at 5-on-5</span>
+
+EV_Off_GAR = (iOff60 − replacement_iOff60) × icetime_hours
+EV_Off_WAR = EV_Off_GAR ÷ 6
+<span class="comment">-- replacement_iOff60 = 15th percentile among qualified players of same position group</span>
+<span class="comment">-- Forwards and Defensemen have separate replacement levels</span>
+<span class="comment">-- Minimum 300 seconds of 5-on-5 ice time to qualify for replacement level calculation</span>
+          </div>
+          <div class="callout info" style="margin-top:10px;">
+            <strong>Why 0.75 and 0.5 for assists?</strong> Primary assists are more skill-driven (direct setup of a shot) while secondary assists carry more luck. The weights reflect their relative predictive value for future performance.
+          </div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <!-- EV Defense -->
+        <div class="stat-entry" id="ev-defense">
+          <div class="stat-name">EV Defense WAR <span class="tag">5-on-5</span></div>
+          <div class="stat-desc">
+            Measures a player's defensive impact by comparing how their team suppresses expected goals <em>when they're on the ice</em> vs. <em>when they're off the ice</em>. A player who is on the ice for fewer xGoals against than their teammates gives up in their absence gets a positive score.
+          </div>
+          <div class="formula">
+onIce_xGA_share  = OnIce_xGoalsAgainst  / (OnIce_xGoalsFor  + OnIce_xGoalsAgainst)
+offIce_xGA_share = OffIce_xGoalsAgainst / (OffIce_xGoalsFor + OffIce_xGoalsAgainst)
+
+def_relative = offIce_xGA_share − onIce_xGA_share
+<span class="comment">-- Positive = suppressed more xGA than teammates did without them</span>
+
+EV_Def_GAR = def_relative × xGoals_context_rate × icetime_hours
+EV_Def_WAR = EV_Def_GAR ÷ 6
+          </div>
+          <div class="callout info" style="margin-top:10px;">
+            <strong>Why on-ice vs. off-ice?</strong> This approach partially controls for team quality — if a player is on a weak defensive team, their off-ice numbers will also look bad, so the <em>differential</em> isolates their personal contribution rather than just reflecting their teammates.
+          </div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <!-- PP WAR -->
+        <div class="stat-entry" id="pp-war">
+          <div class="stat-name">Power Play WAR <span class="tag gold">5-on-4</span></div>
+          <div class="stat-desc">
+            Measures individual offensive contribution on the power play, compared to a replacement-level power play player. The replacement level here is set at <strong>40% of the league average PP production rate</strong> — reflecting that a replacement player on the PP would produce at a well-below-average rate.
+          </div>
+          <div class="formula">
+pp_iOff60 = (PP_xGoals + 0.75 × PP_PrimaryAssists + 0.5 × PP_SecondaryAssists) / pp_hours × 60
+
+repl_pp60 = weighted_average(all pp_iOff60) × 0.40
+<span class="comment">-- Weighted by ice time, among players with >60 seconds PP icetime</span>
+
+PP_GAR = (pp_iOff60 − repl_pp60) × pp_hours
+PP_WAR = PP_GAR ÷ 6
+          </div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <!-- PK WAR -->
+        <div class="stat-entry" id="pk-war">
+          <div class="stat-name">Penalty Kill WAR <span class="tag gold">4-on-5</span></div>
+          <div class="stat-desc">
+            Measures how well a player suppresses expected goals against while shorthanded, relative to the league average PK xGA rate. Positive PK WAR means the player kept their team closer to the league average xGA rate (or better) while killing penalties.
+          </div>
+          <div class="formula">
+pk_xGA60 = OnIce_xGoalsAgainst / pk_hours
+<span class="comment">-- Player's on-ice xGA rate per 60 min while shorthanded</span>
+
+avg_pk_xGA60 = weighted_average(all pk_xGA60)
+<span class="comment">-- Weighted by ice time, among players with >60 seconds PK icetime</span>
+
+PK_GAR = (avg_pk_xGA60 − pk_xGA60) × pk_hours
+<span class="comment">-- Positive = gave up less xGA than the average PK player</span>
+PK_WAR = PK_GAR ÷ 6
+          </div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <!-- Finishing -->
+        <div class="stat-entry" id="finishing">
+          <div class="stat-name">Finishing WAR <span class="tag">All Situations</span></div>
+          <div class="stat-desc">
+            The difference between a player's actual goals and their expected goals. Positive Finishing means the player scored more than the model predicted — either due to shooting talent, luck, or a combination. This is the most volatile component year-to-year.
+          </div>
+          <div class="formula">
+Finishing = Goals − xGoals  (all situations)
+Finishing_WAR = Finishing ÷ 6
+          </div>
+          <div class="callout note" style="margin-top:10px;">
+            <strong>Interpret with caution:</strong> Finishing is noisy. A player with +5 Finishing in one season will often regress toward zero the next. It's included in Total WAR for completeness, but EV Offense + Defense tell a more stable story.
+          </div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <!-- Goalie WAR -->
+        <div class="stat-entry" id="goalie-war">
+          <div class="stat-name">Goalie WAR <span class="tag green">GSAE ÷ 6</span></div>
+          <div class="stat-desc">
+            Goalie WAR is built on <strong>GSAE (Goals Saved Above Expected)</strong> — the difference between the goals a goalie was expected to allow and the goals they actually allowed. A positive GSAE means the goalie outperformed the model; negative means they underperformed.
+          </div>
+          <div class="formula">
+GSAE        = xGoals_faced − Goals_allowed
+<span class="comment">-- xGoals_faced: what an average goalie would allow given the shots faced</span>
+<span class="comment">-- Positive = goalie saved more than expected</span>
+
+Goalie_WAR = GSAE ÷ 6
+
+Save%  = (Shots_on_goal − Goals_allowed) / Shots_on_goal
+xSave% = (Shots_on_goal − xGoals_faced)  / Shots_on_goal
+Sv% − xSv% = how much better/worse than expected
+          </div>
+          <div class="callout info" style="margin-top:10px;">
+            <strong>HD GSAE</strong> (High Danger Goals Saved Above Expected) applies the same logic but only to high-danger shots — typically the most telling indicator of goalie skill since these are the hardest shots to save and require active intervention rather than just positioning.
+          </div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <!-- WAR/82 -->
+        <div class="stat-entry" id="war82">
+          <div class="stat-name">WAR / 82 <span class="tag">Pace stat</span></div>
+          <div class="stat-desc">
+            Projects a player's WAR to a full 82-game season, accounting for games missed due to injury, healthy scratches, or call-ups. Useful for comparing players with different games played — a player with 2.0 WAR in 41 games is on pace for the same full-season production as someone with 4.0 WAR in 82 games.
+          </div>
+          <div class="formula">
+WAR_per82 = Total_WAR / games_played × 82
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Percentiles -->
+    <div class="section" id="percentiles">
+      <div class="section-title">
+        <div class="icon">📊</div>
+        <div>
+          <h2>Percentile Ranks</h2>
+          <p>How player cards show relative performance</p>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="stat-desc">
+          Each WAR bar on a player card shows a percentile rank among their <strong>position group peers</strong> — forwards are ranked against other forwards, defensemen against defensemen, goalies against goalies. The percentile shows what proportion of peers the player outperforms.
+        </div>
+        <div class="formula">
+percentile = count(peers with lower value) / (total peers − 1) × 100
+<span class="comment">-- A 90th percentile EV Offense player outperforms 90% of peers at their position</span>
+        </div>
+        <div class="callout info" style="margin-top:14px;">
+          Percentiles are calculated across <strong>all players in the dataset</strong> regardless of games played filter — so the filter on the leaderboard changes who's displayed, but not their underlying percentile rank.
+        </div>
+      </div>
+    </div>
+
+    <!-- Replacement Level -->
+    <div class="section" id="replacement">
+      <div class="section-title">
+        <div class="icon">📉</div>
+        <div>
+          <h2>Replacement Level</h2>
+          <p>The baseline every player is measured against</p>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="stat-desc">
+          A "replacement player" represents the freely available talent pool — someone who can be called up from the AHL, claimed off waivers, or signed as a depth signing. Players at or below replacement level provide negative value relative to what's easily available.
+        </div>
+        <div class="formula">
+EV replacement level = 15th percentile of iOff60 among qualified skaters
+<span class="comment">-- Calculated separately for Forwards and Defensemen</span>
+<span class="comment">-- Qualified = at least 300 seconds (5 minutes) of 5-on-5 ice time</span>
+
+PP replacement level = league average PP production rate × 40%
+PK replacement level = league average PK xGA allowed rate
+        </div>
+        <div class="callout note" style="margin-top:14px;">
+          The <strong>15th percentile</strong> cutoff is a common convention in hockey analytics, roughly reflecting the production level of the marginal NHL roster player. This means approximately 85% of qualified skaters provide positive EV Offense value.
+        </div>
+      </div>
+    </div>
+
+    <!-- Possession Stats -->
+    <div class="section" id="possession">
+      <div class="section-title">
+        <div class="icon">🎯</div>
+        <div>
+          <h2>Possession &amp; Shot Quality Stats</h2>
+          <p>The building blocks used across all three pages</p>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <div class="stat-entry">
+          <div class="stat-name">xGoals <span class="tag">Expected Goals</span></div>
+          <div class="stat-desc">
+            A probability-based measure of shot quality. Each shot is assigned a likelihood of becoming a goal based on factors like shot location, shot type, and whether it followed a rebound. <strong>xGoals models out luck</strong> — a player who generates high-xG shots is doing the right things even if the puck isn't going in yet.
+          </div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <div class="stat-entry">
+          <div class="stat-name">xGF% <span class="tag">Expected Goals For %</span></div>
+          <div class="stat-desc">
+            The share of total expected goals that belonged to a player or team's side. Above 50% means the player/team is generating more quality chances than they're giving up.
+          </div>
+          <div class="formula">xGF% = xGoalsFor / (xGoalsFor + xGoalsAgainst)</div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <div class="stat-entry">
+          <div class="stat-name">CF% <span class="tag">Corsi For %</span></div>
+          <div class="stat-desc">
+            Share of total shot attempts (on goal + missed + blocked) belonging to a player or team. A pure possession metric — if a team has 60% CF%, they're directing 60% of all shot attempts. Corsi is less predictive than xGF% but is a useful volume proxy.
+          </div>
+          <div class="formula">CF% = ShotAttemptsFor / (ShotAttemptsFor + ShotAttemptsAgainst)</div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <div class="stat-entry">
+          <div class="stat-name">FF% <span class="tag">Fenwick For %</span></div>
+          <div class="stat-desc">
+            Like Corsi but excludes blocked shots. Unblocked shot attempts are generally considered a better proxy for puck possession than total attempts since blocking shots is a defensive skill that can inflate Corsi for weaker teams.
+          </div>
+          <div class="formula">FF% = UnblockedShotAttemptsFor / (UnblockedFor + UnblockedAgainst)</div>
+        </div>
+
+        <hr class="entry-divider">
+
+        <div class="stat-entry">
+          <div class="stat-name">HDxGF% <span class="tag">High Danger</span></div>
+          <div class="stat-desc">
+            The xGF% calculation applied only to high-danger shot locations — typically the slot and crease area directly in front of the net. These shots have a much higher base conversion rate and are harder to generate, making this metric a quality signal on top of a quantity signal.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Team Stats -->
+    <div class="section" id="team-stats">
+      <div class="section-title">
+        <div class="icon">🏒</div>
+        <div>
+          <h2>Team Stats Page</h2>
+          <p>What each view and column shows</p>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="stat-desc" style="margin-bottom:16px;">
+          The Teams page pulls directly from the situation-filtered team data. Each tab shows a different game state.
+        </div>
+        <table class="gloss-table">
+          <thead>
+            <tr><th>Column</th><th>Situation</th><th>What it means</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>xGF%</td><td>5-on-5</td><td>Share of expected goals at even strength. The single best predictor of future team performance.</td></tr>
+            <tr><td>CF%</td><td>5-on-5</td><td>Shot attempt share at even strength. Measures puck possession volume.</td></tr>
+            <tr><td>FF%</td><td>5-on-5</td><td>Unblocked shot attempt share. Slightly cleaner possession proxy than Corsi.</td></tr>
+            <tr><td>GF / GA</td><td>5-on-5 or All</td><td>Actual goals for and goals against in the selected situation.</td></tr>
+            <tr><td>xGF / xGA</td><td>5-on-5 or All</td><td>Expected goals for and against — the model's estimate of deserved goal totals.</td></tr>
+            <tr><td>HDxGF / HDxGA</td><td>5-on-5</td><td>High danger expected goals. Measures quality of chances generated vs. conceded from the slot area.</td></tr>
+            <tr><td>HDGF / HDGA</td><td>5-on-5</td><td>Actual goals from high danger locations.</td></tr>
+            <tr><td>SOG For / Against</td><td>All</td><td>Shots on goal for and against over the full season.</td></tr>
+            <tr><td>FO%</td><td>All</td><td>Faceoff win percentage. Calculated from total faceoffs won vs. lost across all situations.</td></tr>
+            <tr><td>PP GF</td><td>5-on-4</td><td>Power play goals scored.</td></tr>
+            <tr><td>PP xGF</td><td>5-on-4</td><td>Expected power play goals — whether the PP was generating dangerous chances.</td></tr>
+            <tr><td>PP TOI</td><td>5-on-4</td><td>Total power play ice time in minutes. Higher TOI means more penalties drawn.</td></tr>
+            <tr><td>PK GA</td><td>4-on-5</td><td>Goals allowed while shorthanded.</td></tr>
+            <tr><td>PK xGA</td><td>4-on-5</td><td>Expected goals allowed on the PK — how dangerous the shots against were.</td></tr>
+            <tr><td>PK TOI</td><td>4-on-5</td><td>Total penalty kill ice time in minutes.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lines Stats -->
+    <div class="section" id="lines-stats">
+      <div class="section-title">
+        <div class="icon">⛸️</div>
+        <div>
+          <h2>Lines &amp; Pairings Page</h2>
+          <p>What each column shows</p>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="stat-desc" style="margin-bottom:16px;">
+          Lines data is <strong>5-on-5 only</strong>. Each row represents a unique forward line or defensive pairing — any combination of players who skated together at even strength. Combos with more ice time are more meaningful; the default minimum TOI filter (100 min) removes small samples.
+        </div>
+        <table class="gloss-table">
+          <thead>
+            <tr><th>Column</th><th>What it means</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>TOI (min)</td><td>Total 5-on-5 ice time together in minutes. Higher = more data, more reliable.</td></tr>
+            <tr><td>xGF%</td><td>Expected goals share while this combination was on the ice. The primary quality measure.</td></tr>
+            <tr><td>CF%</td><td>Shot attempt share — possession volume for this combination.</td></tr>
+            <tr><td>GF / GA</td><td>Goals for and against while this line/pairing was on the ice together.</td></tr>
+            <tr><td>xGF / xGA</td><td>Expected goals for and against — smooths out shooting/goalie luck.</td></tr>
+            <tr><td>HDxGF%</td><td>High danger expected goals share — are they dominating the slot battle?</td></tr>
+            <tr><td>HDxGF / HDxGA</td><td>High danger expected goals raw totals for each side.</td></tr>
+          </tbody>
+        </table>
+        <div class="callout note" style="margin-top:14px;">
+          <strong>Small sample caveat:</strong> Even a 100-minute filter only covers roughly 1–2 games' worth of even-strength ice time. Lines with under 300–500 minutes together should be read as directional signals rather than firm conclusions.
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Glossary -->
+    <div class="section" id="glossary">
+      <div class="section-title">
+        <div class="icon">📋</div>
+        <div>
+          <h2>Full Glossary</h2>
+          <p>Quick reference for every abbreviation used across the site</p>
+        </div>
+      </div>
+      <div class="section-body">
+        <table class="gloss-table">
+          <thead>
+            <tr><th>Term</th><th>Definition</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>WAR</td><td>Wins Above Replacement. Wins added over a replacement-level player in the same role.</td></tr>
+            <tr><td>GAR</td><td>Goals Above Replacement. WAR × 6. The raw goals-scale version of WAR.</td></tr>
+            <tr><td>WAR/82</td><td>WAR pace-adjusted to 82 games played.</td></tr>
+            <tr><td>EV Off WAR</td><td>Even strength offensive WAR. Individual offensive production at 5-on-5 vs. replacement.</td></tr>
+            <tr><td>EV Def WAR</td><td>Even strength defensive WAR. On-ice xGA suppression vs. off-ice baseline at 5-on-5.</td></tr>
+            <tr><td>PP WAR</td><td>Power play WAR. Individual PP production rate vs. a below-average replacement PP player.</td></tr>
+            <tr><td>PK WAR</td><td>Penalty kill WAR. xGA suppression vs. league average PK rate.</td></tr>
+            <tr><td>Finishing WAR</td><td>Goals above expected goals, divided by 6. Captures shooting talent or luck.</td></tr>
+            <tr><td>GSAE</td><td>Goals Saved Above Expected. xGoals faced minus goals allowed. Goalie's primary WAR driver.</td></tr>
+            <tr><td>HD GSAE</td><td>High danger GSAE. GSAE calculated only on high-danger shots.</td></tr>
+            <tr><td>Goalie WAR</td><td>GSAE ÷ 6.</td></tr>
+            <tr><td>xG / xGoals</td><td>Expected Goals. Probability-weighted shot quality measure.</td></tr>
+            <tr><td>xGF%</td><td>Expected Goals For %. Share of total xGoals belonging to the player's or team's side.</td></tr>
+            <tr><td>CF%</td><td>Corsi For %. Share of all shot attempts (on goal + missed + blocked).</td></tr>
+            <tr><td>FF%</td><td>Fenwick For %. Share of all unblocked shot attempts.</td></tr>
+            <tr><td>HDxGF%</td><td>High Danger Expected Goals For %. xGF% from the slot/crease area only.</td></tr>
+            <tr><td>iOff60</td><td>Individual Offensive Rate per 60. Weighted xG + assists, per 60 min of ice time.</td></tr>
+            <tr><td>Sv%</td><td>Save Percentage. (Shots on goal − Goals allowed) / Shots on goal.</td></tr>
+            <tr><td>xSv%</td><td>Expected Save Percentage. What an average goalie would have saved given the same shots.</td></tr>
+            <tr><td>Sv% − xSv%</td><td>How much better or worse than expected the goalie performed. Positive = outperformed.</td></tr>
+            <tr><td>GF / GA</td><td>Goals For / Goals Against.</td></tr>
+            <tr><td>SOG</td><td>Shots on Goal.</td></tr>
+            <tr><td>FO%</td><td>Faceoff Win Percentage.</td></tr>
+            <tr><td>TOI</td><td>Time on Ice.</td></tr>
+            <tr><td>GP</td><td>Games Played.</td></tr>
+            <tr><td>PP</td><td>Power Play (5-on-4).</td></tr>
+            <tr><td>PK</td><td>Penalty Kill (4-on-5).</td></tr>
+            <tr><td>EV</td><td>Even Strength (5-on-5).</td></tr>
+            <tr><td>1st A</td><td>Primary Assists. Direct setup of the goal scorer.</td></tr>
+            <tr><td>2nd A</td><td>Secondary Assists. Pass leading to the primary assist.</td></tr>
+            <tr><td>Repl. Level</td><td>Replacement Level. The production baseline of a freely available player.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /page-wrap -->
+
+</body>
+</html>

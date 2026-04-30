@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHL WAR – Teams 2008-09</title>
+
+<style>
+  :root {
+    --bg:     #0a0e1a; --surf:   #111827; --surf2:  #1e2a3a;
+    --border: #2a3a50; --accent: #00b4d8; --accent2:#0077b6;
+    --gold:   #f4a261; --red:    #e63946; --green:  #2dc653;
+    --muted:  #64748b; --text:   #e2e8f0; --text2:  #94a3b8; --r: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh; padding: 24px 16px;
+  }
+  .site-nav {
+    display: flex; justify-content: center; gap: 6px;
+    margin: 0 auto 28px; max-width: 480px;
+  }
+  .site-nav a {
+    padding: 8px 22px; border-radius: 50px;
+    border: 1px solid var(--border); background: var(--surf);
+    color: var(--text2); font-size: 0.85rem; font-weight: 600;
+    text-decoration: none; transition: all 0.15s;
+  }
+  .site-nav a:hover { border-color: var(--accent); color: var(--accent); }
+  .site-nav a.active { background: var(--accent2); border-color: var(--accent); color: #fff; }
+  .header { text-align: center; margin-bottom: 28px; }
+  .header h1 {
+    font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .header p { color: var(--text2); margin-top: 6px; font-size: 0.9rem; }
+  .controls {
+    max-width: 1300px; margin: 0 auto 16px;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .tab {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--surf); color: var(--text2); font-size: 0.82rem;
+    font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab.active { background: var(--accent2); border-color: var(--accent); color: #fff; }
+  .ctrl-select {
+    padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--surf); color: var(--text); font-size: 0.82rem;
+    cursor: pointer; outline: none;
+  }
+  .ctrl-label { font-size: 0.78rem; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+  .ctrl-input {
+    width: 72px; padding: 5px 8px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surf);
+    color: var(--text); font-size: 0.82rem; outline: none; text-align: center;
+  }
+  .ctrl-right { margin-left: auto; color: var(--muted); font-size: 0.8rem; }
+  .wrap { max-width: 1300px; margin: 0 auto; }
+  .lb-wrap { background: var(--surf); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  thead { background: var(--surf2); border-bottom: 2px solid var(--border); }
+  th {
+    padding: 11px 12px; text-align: left; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.8px; text-transform: uppercase; color: var(--text2);
+    white-space: nowrap; cursor: pointer; user-select: none;
+  }
+  th.num { text-align: right; }
+  th:hover { color: var(--accent); }
+  th.sort-asc::after  { content: ' ↑'; color: var(--accent); }
+  th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+  td { padding: 10px 12px; border-bottom: 1px solid rgba(42,58,80,0.5); white-space: nowrap; }
+  td.num { text-align: right; }
+  tbody tr { cursor: default; transition: background 0.12s; }
+  tbody tr:hover { background: rgba(0,180,216,0.06); }
+  tbody tr:last-child td { border-bottom: none; }
+  .rank-c { color: var(--muted); font-size: 0.8rem; }
+  .name-c { font-weight: 700; }
+  .sub-c  { color: var(--text2); font-size: 0.8rem; font-weight: 400; }
+  .c-green { color: var(--green); font-weight: 700; }
+  .c-red   { color: var(--red);   font-weight: 700; }
+  .c-gold  { color: var(--gold);  font-weight: 700; }
+  .c-muted { color: var(--text2); }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 0.72rem; font-weight: 700;
+  }
+  .badge-line    { background: rgba(0,180,216,0.15); color: var(--accent); }
+  .badge-pairing { background: rgba(244,162,97,0.15); color: var(--gold); }
+  .lb-footer {
+    padding: 10px 16px; background: var(--surf2); border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--muted); text-align: right;
+  }
+  .section-hdr {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text2); padding: 6px 12px; background: rgba(42,58,80,0.3);
+    border-bottom: 1px solid var(--border); font-weight: 700;
+  }
+  .col-group-hdr {
+    text-align: center; font-size: 0.65rem; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--accent); border-bottom: 1px solid var(--border);
+    padding: 5px 0; background: rgba(0,180,216,0.04);
+  }
+</style>
+
+<style>
+  /* ── Search ── */
+  .search-wrap { max-width:520px; margin:0 auto 20px; position:relative; }
+  .search-wrap input {
+    width:100%; padding:12px 20px; border-radius:50px;
+    border:2px solid var(--border); background:var(--surf);
+    color:var(--text); font-size:1rem; outline:none; transition:border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color:var(--accent); }
+  .ac-box {
+    position:absolute; top:calc(100% + 6px); left:0; right:0;
+    background:var(--surf); border:1px solid var(--border); border-radius:var(--r);
+    z-index:100; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:none;
+  }
+  .ac-item { padding:10px 18px; cursor:pointer; font-size:0.9rem; font-weight:600; transition:background 0.12s; }
+  .ac-item:hover { background:var(--surf2); color:var(--accent); }
+
+  /* ── Leaderboard scrollable table ── */
+  .lb-wrap { overflow-x:auto !important; }
+  .lb-table { border-collapse:collapse; font-size:0.84rem; white-space:nowrap; width:100%; }
+  .lb-table th { background:var(--surf2); position:sticky; top:0; z-index:1;
+    font-size:0.75rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+    color:var(--text2); cursor:pointer; user-select:none; padding:8px 10px;
+    border-bottom:2px solid var(--border); }
+  .lb-table th:hover { color:var(--text); }
+  .lb-table td { padding:7px 10px; border-bottom:1px solid var(--border); }
+  .lb-table tbody tr:hover td { background:#0e1d30; }
+  .sc1 { position:sticky !important; z-index:2 !important; background:var(--surf); left:0; min-width:36px; max-width:36px; }
+  .sc2 { position:sticky !important; z-index:2 !important; background:var(--surf); left:36px; min-width:70px; max-width:70px; box-shadow:3px 0 8px rgba(0,0,0,0.4); }
+  .lb-table thead .sc1, .lb-table thead .sc2 { background:var(--surf2) !important; z-index:3 !important; }
+  .lb-table tbody tr:hover .sc1, .lb-table tbody tr:hover .sc2 { background:#0e1d30 !important; }
+  .grp-l { border-left:2px solid var(--border) !important; }
+
+  /* ── Card Area ── */
+  #card-area { max-width:920px; margin:0 auto; display:none; }
+  .back-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    margin-bottom:16px; padding:8px 16px;
+    background:var(--surf); border:1px solid var(--border);
+    border-radius:20px; color:var(--text2); font-size:0.85rem;
+    cursor:pointer; transition:all 0.15s;
+  }
+  .back-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* ── Team Card ── */
+  .player-card {
+    background:var(--surf); border:1px solid var(--border);
+    border-radius:var(--r); overflow:hidden;
+  }
+  .card-header {
+    background:linear-gradient(135deg,var(--surf2),#0d1b2a);
+    padding:22px 26px; display:flex; align-items:center;
+    gap:18px; border-bottom:1px solid var(--border);
+  }
+  .avatar {
+    width:68px; height:68px; border-radius:50%;
+    background:linear-gradient(135deg,#1a3a5c,#00b4d8);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; font-weight:900; color:#fff; flex-shrink:0; letter-spacing:1px;
+  }
+  .player-info h2 { font-size:1.55rem; font-weight:800; line-height:1.1; }
+  .player-meta { display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; align-items:center; }
+  .meta-b {
+    font-size:0.77rem; font-weight:600; padding:3px 10px;
+    border-radius:20px; background:var(--surf); border:1px solid var(--border); color:var(--text2);
+  }
+  .war-summary {
+    padding:18px 26px; display:flex; gap:12px; flex-wrap:wrap;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(to right,rgba(0,180,216,0.05),transparent);
+  }
+  .war-big {
+    flex:1; min-width:130px; text-align:center;
+    padding:12px 14px; background:var(--surf2);
+    border-radius:10px; border:1px solid var(--border);
+  }
+  .war-big.highlight { border-color:var(--accent); background:rgba(0,180,216,0.08); }
+  .war-big .lbl {
+    font-size:0.68rem; font-weight:700; letter-spacing:1px;
+    color:var(--text2); text-transform:uppercase; margin-bottom:4px;
+  }
+  .war-big .val { font-size:1.9rem; font-weight:900; line-height:1; }
+  .war-big .sub { font-size:0.74rem; color:var(--text2); margin-top:4px; }
+  .card-body { padding:22px 26px; display:flex; flex-direction:column; gap:22px; }
+  .section-title {
+    font-size:0.72rem; font-weight:700; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--muted); margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; }
+  .stat-box {
+    background:var(--surf2); border:1px solid var(--border);
+    border-radius:8px; padding:10px 12px; text-align:center;
+  }
+  .stat-box .sv { font-size:1.1rem; font-weight:800; }
+  .stat-box .sl { font-size:0.68rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+  .bar-row { margin-bottom:12px; }
+  .bar-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; font-size:0.84rem; }
+  .bar-lbl { font-weight:600; }
+  .bar-val { font-weight:700; }
+  .bar-track { height:7px; background:var(--surf2); border-radius:4px; overflow:hidden; }
+  .bar-fill  { height:100%; border-radius:4px; }
+  .bar-blue  { background:linear-gradient(90deg,#0077b6,#00b4d8); }
+  .bar-green { background:linear-gradient(90deg,#2dc653,#00b4d8); }
+  .bar-red   { background:linear-gradient(90deg,#e63946,#c1121f); }
+
+  @media (max-width:640px) {
+    .card-header { flex-direction:column; align-items:flex-start; }
+    .war-big .val { font-size:1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🏒 NHL Team Stats</h1>
+  <p>2008-09 Season · All Situations &amp; 5-on-5</p>
+</div>
+<nav class="site-nav">
+  <a href="NHL_WAR_Cards_2008-09.html">Players</a>
+  <a href="NHL_WAR_Teams_2008-09.html" class="active">Teams</a>
+  <a href="NHL_WAR_Lines_2008-09.html">Lines</a>
+  <a href="../NHL_WAR_About.html">About</a>
+  <select onchange="location.href=this.value" style="padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:0.82rem;cursor:pointer;outline:none;font-weight:600;">
+    <option value="../NHL_WAR_Teams.html">2025-26</option>
+    <option value="NHL_WAR_Teams_2024-25.html">2024-25</option>
+    <option value="NHL_WAR_Teams_2023-24.html">2023-24</option>
+    <option value="NHL_WAR_Teams_2022-23.html">2022-23</option>
+    <option value="NHL_WAR_Teams_2021-22.html">2021-22</option>
+    <option value="NHL_WAR_Teams_2020-21.html">2020-21</option>
+    <option value="NHL_WAR_Teams_2019-20.html">2019-20</option>
+    <option value="NHL_WAR_Teams_2018-19.html">2018-19</option>
+    <option value="NHL_WAR_Teams_2017-18.html">2017-18</option>
+    <option value="NHL_WAR_Teams_2016-17.html">2016-17</option>
+    <option value="NHL_WAR_Teams_2015-16.html">2015-16</option>
+    <option value="NHL_WAR_Teams_2014-15.html">2014-15</option>
+    <option value="NHL_WAR_Teams_2013-14.html">2013-14</option>
+    <option value="NHL_WAR_Teams_2012-13.html">2012-13</option>
+    <option value="NHL_WAR_Teams_2011-12.html">2011-12</option>
+    <option value="NHL_WAR_Teams_2010-11.html">2010-11</option>
+    <option value="NHL_WAR_Teams_2009-10.html">2009-10</option>
+    <option value="NHL_WAR_Teams_2008-09.html" selected>2008-09</option>
+  </select>
+</nav>
+
+<div id="leaderboard-area">
+  <div class="search-wrap">
+    <input id="search" type="text" placeholder="Search a team… (e.g. TOR, BOS, EDM)" autocomplete="off">
+    <div class="ac-box" id="ac-box"></div>
+  </div>
+
+  <div class="controls">
+    <span class="ctrl-right" id="row-count"></span>
+  </div>
+
+  <div class="wrap">
+    <div class="lb-wrap">
+      <table id="lb" class="lb-table">
+        <thead>
+          <tr>
+            <th class="sc1" data-k="rank">#</th>
+            <th class="sc2" data-k="team">Team</th>
+            <th class="num grp-l" data-k="gp">GP</th>
+            <th class="num grp-l" data-k="ev_xgf_pct" title="5-on-5 Expected Goals For %">xGF%</th>
+            <th class="num" data-k="ev_cf_pct" title="5-on-5 Corsi For %">CF%</th>
+            <th class="num" data-k="ev_ff_pct" title="5-on-5 Fenwick For %">FF%</th>
+            <th class="num" data-k="ev_gf" title="5-on-5 Goals For">EV&nbsp;GF</th>
+            <th class="num" data-k="ev_ga" title="5-on-5 Goals Against">EV&nbsp;GA</th>
+            <th class="num" data-k="ev_xgf" title="5-on-5 Expected Goals For">EV&nbsp;xGF</th>
+            <th class="num" data-k="ev_xga" title="5-on-5 Expected Goals Against">EV&nbsp;xGA</th>
+            <th class="num" data-k="ev_hdxgf" title="5-on-5 High Danger xGoals For">HDxGF</th>
+            <th class="num" data-k="ev_hdxga" title="5-on-5 High Danger xGoals Against">HDxGA</th>
+            <th class="num" data-k="ev_hdgf" title="5-on-5 High Danger Goals For">HDGF</th>
+            <th class="num" data-k="ev_hdga" title="5-on-5 High Danger Goals Against">HDGA</th>
+            <th class="num" data-k="ev_toi_min" title="5-on-5 Time on Ice (minutes)">EV&nbsp;TOI</th>
+            <th class="num grp-l" data-k="pp_gf" title="Power Play Goals For">PP&nbsp;GF</th>
+            <th class="num" data-k="pp_xgf" title="Power Play Expected Goals For">PP&nbsp;xGF</th>
+            <th class="num" data-k="pp_hdxgf" title="Power Play High Danger xGoals For">PP&nbsp;HDxGF</th>
+            <th class="num" data-k="pp_sog_f" title="Power Play Shots on Goal For">PP&nbsp;SOG</th>
+            <th class="num" data-k="pp_toi" title="Power Play Time on Ice (minutes)">PP&nbsp;TOI</th>
+            <th class="num grp-l" data-k="pk_ga" title="Penalty Kill Goals Against">PK&nbsp;GA</th>
+            <th class="num" data-k="pk_xga" title="Penalty Kill Expected Goals Against">PK&nbsp;xGA</th>
+            <th class="num" data-k="pk_hdxga" title="Penalty Kill High Danger xGoals Against">PK&nbsp;HDxGA</th>
+            <th class="num" data-k="pk_sog_a" title="Penalty Kill Shots on Goal Against">PK&nbsp;SOG</th>
+            <th class="num" data-k="pk_toi" title="Penalty Kill Time on Ice (minutes)">PK&nbsp;TOI</th>
+            <th class="num grp-l" data-k="gf" title="All-situations Goals For">GF</th>
+            <th class="num" data-k="ga" title="All-situations Goals Against">GA</th>
+            <th class="num" data-k="xgf_a" title="All-situations Expected Goals For">xGF</th>
+            <th class="num" data-k="xga_a" title="All-situations Expected Goals Against">xGA</th>
+            <th class="num" data-k="sog_f" title="All-situations Shots on Goal For">SOG&nbsp;For</th>
+            <th class="num" data-k="sog_a" title="All-situations Shots on Goal Against">SOG&nbsp;Agnst</th>
+            <th class="num" data-k="fo_pct" title="Faceoff Win %">FO%</th>
+            <th class="num" data-k="hits_f" title="Hits For">Hits</th>
+            <th class="num" data-k="pk_drawn" title="Penalties Drawn">Pens&nbsp;Drawn</th>
+            <th class="num" data-k="pk_taken" title="Penalties Taken">Pens&nbsp;Taken</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="lb-footer">Data: Natural Stat Trick · Built Apr 21, 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- Team Card (full-page, hidden until selected) -->
+<div id="card-area">
+  <div class="back-btn" id="back-btn">← Back to Teams</div>
+  <div id="card-inner"></div>
+</div>
+
+<script>
+const TEAMS = [{"team": "ANA", "gp": 82, "gf": 238, "ga": 235, "xgf_a": 227.6, "xga_a": 222.71, "sog_f": 2481, "sog_a": 2500, "fo_pct": 49.8, "hits_f": 1758, "hits_a": 1678, "pk_drawn": 521, "pk_taken": 432, "ev_xgf_pct": 52.0, "ev_cf_pct": 51.0, "ev_ff_pct": 51.0, "ev_xgf": 137.54, "ev_xga": 127.07, "ev_gf": 146, "ev_ga": 131, "ev_hdxgf": 25.25, "ev_hdxga": 21.2, "ev_hdgf": 36, "ev_hdga": 25, "ev_sog_f": 1741, "ev_sog_a": 1726, "ev_toi_min": 3726.9, "pp_gf": 65, "pp_xgf": 59.77, "pp_toi": 455.1, "pp_hdxgf": 28.44, "pp_sog_f": 477, "pk_ga": 68, "pk_xga": 64.81, "pk_toi": 589.5, "pk_hdxga": 32.72, "pk_sog_a": 554}, {"team": "ARI", "gp": 81, "gf": 200, "ga": 248, "xgf_a": 195.56, "xga_a": 223.8, "sog_f": 2269, "sog_a": 2555, "fo_pct": 44.9, "hits_f": 1793, "hits_a": 1771, "pk_drawn": 387, "pk_taken": 433, "ev_xgf_pct": 46.0, "ev_cf_pct": 45.0, "ev_ff_pct": 45.0, "ev_xgf": 119.17, "ev_xga": 141.35, "ev_gf": 130, "ev_ga": 158, "ev_hdxgf": 20.35, "ev_hdxga": 23.82, "ev_hdgf": 23, "ev_hdga": 36, "ev_sog_f": 1666, "ev_sog_a": 1945, "ev_toi_min": 3807.5, "pp_gf": 45, "pp_xgf": 49.37, "pp_toi": 500.9, "pp_hdxgf": 26.04, "pp_sog_f": 424, "pk_ga": 60, "pk_xga": 52.55, "pk_toi": 403.4, "pk_hdxga": 31.66, "pk_sog_a": 375}, {"team": "ATL", "gp": 82, "gf": 255, "ga": 285, "xgf_a": 220.88, "xga_a": 251.59, "sog_f": 2371, "sog_a": 2745, "fo_pct": 51.2, "hits_f": 1418, "hits_a": 1239, "pk_drawn": 481, "pk_taken": 476, "ev_xgf_pct": 47.0, "ev_cf_pct": 46.0, "ev_ff_pct": 46.0, "ev_xgf": 135.8, "ev_xga": 153.15, "ev_gf": 150, "ev_ga": 162, "ev_hdxgf": 28.62, "ev_hdxga": 30.94, "ev_hdgf": 32, "ev_hdga": 41, "ev_sog_f": 1676, "ev_sog_a": 1985, "ev_toi_min": 3784.8, "pp_gf": 62, "pp_xgf": 50.74, "pp_toi": 558.0, "pp_hdxgf": 30.48, "pp_sog_f": 423, "pk_ga": 80, "pk_xga": 62.23, "pk_toi": 545.0, "pk_hdxga": 32.76, "pk_sog_a": 518}, {"team": "BOS", "gp": 81, "gf": 267, "ga": 188, "xgf_a": 223.59, "xga_a": 216.03, "sog_f": 2460, "sog_a": 2495, "fo_pct": 51.0, "hits_f": 1792, "hits_a": 1875, "pk_drawn": 393, "pk_taken": 398, "ev_xgf_pct": 51.0, "ev_cf_pct": 51.0, "ev_ff_pct": 50.0, "ev_xgf": 142.82, "ev_xga": 138.02, "ev_gf": 165, "ev_ga": 113, "ev_hdxgf": 28.93, "ev_hdxga": 27.99, "ev_hdgf": 29, "ev_hdga": 26, "ev_sog_f": 1828, "ev_sog_a": 1873, "ev_toi_min": 3814.3, "pp_gf": 66, "pp_xgf": 48.56, "pp_toi": 476.4, "pp_hdxgf": 26.47, "pp_sog_f": 436, "pk_ga": 50, "pk_xga": 51.37, "pk_toi": 445.7, "pk_hdxga": 30.87, "pk_sog_a": 405}, {"team": "BUF", "gp": 82, "gf": 242, "ga": 229, "xgf_a": 216.07, "xga_a": 211.38, "sog_f": 2507, "sog_a": 2575, "fo_pct": 47.4, "hits_f": 1458, "hits_a": 1615, "pk_drawn": 430, "pk_taken": 445, "ev_xgf_pct": 51.0, "ev_cf_pct": 49.0, "ev_ff_pct": 49.0, "ev_xgf": 131.37, "ev_xga": 126.45, "ev_gf": 153, "ev_ga": 145, "ev_hdxgf": 28.67, "ev_hdxga": 22.19, "ev_hdgf": 41, "ev_hdga": 25, "ev_sog_f": 1839, "ev_sog_a": 1841, "ev_toi_min": 3700.8, "pp_gf": 60, "pp_xgf": 55.68, "pp_toi": 516.4, "pp_hdxgf": 31.98, "pp_sog_f": 437, "pk_ga": 50, "pk_xga": 49.17, "pk_toi": 489.4, "pk_hdxga": 22.78, "pk_sog_a": 459}, {"team": "CAR", "gp": 82, "gf": 236, "ga": 221, "xgf_a": 240.81, "xga_a": 237.2, "sog_f": 2675, "sog_a": 2419, "fo_pct": 51.3, "hits_f": 1716, "hits_a": 1955, "pk_drawn": 352, "pk_taken": 423, "ev_xgf_pct": 51.0, "ev_cf_pct": 52.0, "ev_ff_pct": 52.0, "ev_xgf": 152.04, "ev_xga": 148.25, "ev_gf": 137, "ev_ga": 139, "ev_hdxgf": 34.45, "ev_hdxga": 37.09, "ev_hdgf": 34, "ev_hdga": 36, "ev_sog_f": 1965, "ev_sog_a": 1771, "ev_toi_min": 3732.7, "pp_gf": 59, "pp_xgf": 56.35, "pp_toi": 558.2, "pp_hdxgf": 30.28, "pp_sog_f": 471, "pk_ga": 50, "pk_xga": 50.58, "pk_toi": 442.8, "pk_hdxga": 26.35, "pk_sog_a": 405}, {"team": "CBJ", "gp": 82, "gf": 220, "ga": 223, "xgf_a": 190.74, "xga_a": 191.01, "sog_f": 2371, "sog_a": 2281, "fo_pct": 51.2, "hits_f": 1919, "hits_a": 2071, "pk_drawn": 446, "pk_taken": 435, "ev_xgf_pct": 52.0, "ev_cf_pct": 52.0, "ev_ff_pct": 52.0, "ev_xgf": 123.04, "ev_xga": 112.1, "ev_gf": 154, "ev_ga": 131, "ev_hdxgf": 21.04, "ev_hdxga": 19.22, "ev_hdgf": 30, "ev_hdga": 24, "ev_sog_f": 1758, "ev_sog_a": 1581, "ev_toi_min": 3786.1, "pp_gf": 39, "pp_xgf": 40.88, "pp_toi": 494.4, "pp_hdxgf": 16.2, "pp_sog_f": 395, "pk_ga": 55, "pk_xga": 48.67, "pk_toi": 516.5, "pk_hdxga": 24.65, "pk_sog_a": 425}, {"team": "CGY", "gp": 81, "gf": 248, "ga": 242, "xgf_a": 230.08, "xga_a": 218.72, "sog_f": 2611, "sog_a": 2402, "fo_pct": 51.4, "hits_f": 1531, "hits_a": 1521, "pk_drawn": 464, "pk_taken": 473, "ev_xgf_pct": 54.0, "ev_cf_pct": 56.0, "ev_ff_pct": 54.0, "ev_xgf": 148.4, "ev_xga": 127.03, "ev_gf": 160, "ev_ga": 153, "ev_hdxgf": 32.34, "ev_hdxga": 26.94, "ev_hdgf": 35, "ev_hdga": 34, "ev_sog_f": 1926, "ev_sog_a": 1681, "ev_toi_min": 3636.4, "pp_gf": 53, "pp_xgf": 53.67, "pp_toi": 544.0, "pp_hdxgf": 29.7, "pp_sog_f": 461, "pk_ga": 50, "pk_xga": 56.22, "pk_toi": 514.6, "pk_hdxga": 27.55, "pk_sog_a": 490}, {"team": "CHI", "gp": 82, "gf": 260, "ga": 209, "xgf_a": 231.4, "xga_a": 210.42, "sog_f": 2683, "sog_a": 2344, "fo_pct": 48.1, "hits_f": 1520, "hits_a": 1652, "pk_drawn": 411, "pk_taken": 445, "ev_xgf_pct": 53.0, "ev_cf_pct": 55.0, "ev_ff_pct": 55.0, "ev_xgf": 147.47, "ev_xga": 132.84, "ev_gf": 151, "ev_ga": 128, "ev_hdxgf": 31.67, "ev_hdxga": 28.99, "ev_hdgf": 32, "ev_hdga": 26, "ev_sog_f": 1987, "ev_sog_a": 1665, "ev_toi_min": 3751.2, "pp_gf": 63, "pp_xgf": 51.03, "pp_toi": 531.1, "pp_hdxgf": 26.92, "pp_sog_f": 459, "pk_ga": 54, "pk_xga": 49.82, "pk_toi": 480.7, "pk_hdxga": 23.32, "pk_sog_a": 450}, {"team": "COL", "gp": 82, "gf": 190, "ga": 253, "xgf_a": 203.61, "xga_a": 215.48, "sog_f": 2359, "sog_a": 2376, "fo_pct": 47.8, "hits_f": 1462, "hits_a": 1379, "pk_drawn": 398, "pk_taken": 397, "ev_xgf_pct": 49.0, "ev_cf_pct": 47.0, "ev_ff_pct": 48.0, "ev_xgf": 137.19, "ev_xga": 140.16, "ev_gf": 126, "ev_ga": 170, "ev_hdxgf": 24.36, "ev_hdxga": 26.81, "ev_hdgf": 21, "ev_hdga": 32, "ev_sog_f": 1766, "ev_sog_a": 1804, "ev_toi_min": 3818.9, "pp_gf": 47, "pp_xgf": 46.49, "pp_toi": 494.4, "pp_hdxgf": 22.88, "pp_sog_f": 399, "pk_ga": 56, "pk_xga": 47.58, "pk_toi": 483.5, "pk_hdxga": 24.44, "pk_sog_a": 387}, {"team": "DAL", "gp": 82, "gf": 224, "ga": 251, "xgf_a": 210.28, "xga_a": 222.56, "sog_f": 2370, "sog_a": 2304, "fo_pct": 47.8, "hits_f": 2076, "hits_a": 2187, "pk_drawn": 435, "pk_taken": 446, "ev_xgf_pct": 48.0, "ev_cf_pct": 50.0, "ev_ff_pct": 50.0, "ev_xgf": 129.63, "ev_xga": 138.71, "ev_gf": 150, "ev_ga": 159, "ev_hdxgf": 24.83, "ev_hdxga": 29.07, "ev_hdgf": 34, "ev_hdga": 32, "ev_sog_f": 1678, "ev_sog_a": 1699, "ev_toi_min": 3745.4, "pp_gf": 47, "pp_xgf": 53.19, "pp_toi": 524.7, "pp_hdxgf": 28.98, "pp_sog_f": 430, "pk_ga": 65, "pk_xga": 51.99, "pk_toi": 502.8, "pk_hdxga": 30.24, "pk_sog_a": 383}, {"team": "DET", "gp": 81, "gf": 285, "ga": 237, "xgf_a": 254.14, "xga_a": 210.66, "sog_f": 2926, "sog_a": 2242, "fo_pct": 55.0, "hits_f": 1457, "hits_a": 1686, "pk_drawn": 370, "pk_taken": 403, "ev_xgf_pct": 52.0, "ev_cf_pct": 57.0, "ev_ff_pct": 56.0, "ev_xgf": 148.47, "ev_xga": 135.75, "ev_gf": 170, "ev_ga": 142, "ev_hdxgf": 21.48, "ev_hdxga": 31.54, "ev_hdgf": 24, "ev_hdga": 39, "ev_sog_f": 2109, "ev_sog_a": 1636, "ev_toi_min": 3765.4, "pp_gf": 77, "pp_xgf": 68.46, "pp_toi": 482.3, "pp_hdxgf": 34.34, "pp_sog_f": 543, "pk_ga": 58, "pk_xga": 46.73, "pk_toi": 470.6, "pk_hdxga": 24.92, "pk_sog_a": 390}, {"team": "EDM", "gp": 82, "gf": 228, "ga": 244, "xgf_a": 219.89, "xga_a": 241.97, "sog_f": 2303, "sog_a": 2668, "fo_pct": 47.9, "hits_f": 1393, "hits_a": 1460, "pk_drawn": 451, "pk_taken": 466, "ev_xgf_pct": 49.0, "ev_cf_pct": 48.0, "ev_ff_pct": 47.0, "ev_xgf": 140.54, "ev_xga": 148.45, "ev_gf": 150, "ev_ga": 146, "ev_hdxgf": 32.54, "ev_hdxga": 26.88, "ev_hdgf": 30, "ev_hdga": 27, "ev_sog_f": 1691, "ev_sog_a": 1923, "ev_toi_min": 3725.2, "pp_gf": 49, "pp_xgf": 47.62, "pp_toi": 547.0, "pp_hdxgf": 25.75, "pp_sog_f": 379, "pk_ga": 63, "pk_xga": 58.76, "pk_toi": 501.9, "pk_hdxga": 30.69, "pk_sog_a": 505}, {"team": "FLA", "gp": 82, "gf": 231, "ga": 223, "xgf_a": 227.85, "xga_a": 247.38, "sog_f": 2412, "sog_a": 2844, "fo_pct": 47.9, "hits_f": 1562, "hits_a": 1718, "pk_drawn": 365, "pk_taken": 368, "ev_xgf_pct": 47.0, "ev_cf_pct": 47.0, "ev_ff_pct": 46.0, "ev_xgf": 149.3, "ev_xga": 165.0, "ev_gf": 153, "ev_ga": 145, "ev_hdxgf": 35.5, "ev_hdxga": 37.1, "ev_hdgf": 38, "ev_hdga": 35, "ev_sog_f": 1809, "ev_sog_a": 2168, "ev_toi_min": 3855.5, "pp_gf": 42, "pp_xgf": 48.02, "pp_toi": 489.0, "pp_hdxgf": 24.6, "pp_sog_f": 410, "pk_ga": 51, "pk_xga": 55.06, "pk_toi": 474.4, "pk_hdxga": 27.87, "pk_sog_a": 461}, {"team": "L.A", "gp": 82, "gf": 202, "ga": 226, "xgf_a": 225.29, "xga_a": 220.77, "sog_f": 2383, "sog_a": 2302, "fo_pct": 52.0, "hits_f": 2128, "hits_a": 2009, "pk_drawn": 462, "pk_taken": 461, "ev_xgf_pct": 51.0, "ev_cf_pct": 51.0, "ev_ff_pct": 51.0, "ev_xgf": 136.98, "ev_xga": 130.1, "ev_gf": 114, "ev_ga": 137, "ev_hdxgf": 26.55, "ev_hdxga": 25.72, "ev_hdgf": 30, "ev_hdga": 23, "ev_sog_f": 1660, "ev_sog_a": 1659, "ev_toi_min": 3680.6, "pp_gf": 54, "pp_xgf": 46.8, "pp_toi": 522.4, "pp_hdxgf": 20.02, "pp_sog_f": 426, "pk_ga": 51, "pk_xga": 55.47, "pk_toi": 574.9, "pk_hdxga": 29.49, "pk_sog_a": 421}, {"team": "MIN", "gp": 82, "gf": 214, "ga": 197, "xgf_a": 188.02, "xga_a": 202.35, "sog_f": 2258, "sog_a": 2518, "fo_pct": 48.5, "hits_f": 1468, "hits_a": 1443, "pk_drawn": 353, "pk_taken": 394, "ev_xgf_pct": 46.0, "ev_cf_pct": 47.0, "ev_ff_pct": 47.0, "ev_xgf": 115.06, "ev_xga": 132.79, "ev_gf": 122, "ev_ga": 136, "ev_hdxgf": 18.07, "ev_hdxga": 21.06, "ev_hdgf": 15, "ev_hdga": 17, "ev_sog_f": 1630, "ev_sog_a": 1867, "ev_toi_min": 3837.6, "pp_gf": 58, "pp_xgf": 46.71, "pp_toi": 479.1, "pp_hdxgf": 24.55, "pp_sog_f": 407, "pk_ga": 27, "pk_xga": 41.63, "pk_toi": 471.6, "pk_hdxga": 18.45, "pk_sog_a": 417}, {"team": "MTL", "gp": 82, "gf": 242, "ga": 240, "xgf_a": 237.09, "xga_a": 240.31, "sog_f": 2461, "sog_a": 2601, "fo_pct": 50.9, "hits_f": 1974, "hits_a": 1827, "pk_drawn": 487, "pk_taken": 484, "ev_xgf_pct": 47.0, "ev_cf_pct": 48.0, "ev_ff_pct": 47.0, "ev_xgf": 135.98, "ev_xga": 151.18, "ev_gf": 146, "ev_ga": 149, "ev_hdxgf": 29.48, "ev_hdxga": 36.58, "ev_hdgf": 26, "ev_hdga": 39, "ev_sog_f": 1737, "ev_sog_a": 1912, "ev_toi_min": 3679.7, "pp_gf": 58, "pp_xgf": 65.61, "pp_toi": 545.6, "pp_hdxgf": 37.81, "pp_sog_f": 470, "pk_ga": 58, "pk_xga": 56.05, "pk_toi": 515.5, "pk_hdxga": 34.39, "pk_sog_a": 421}, {"team": "N.J", "gp": 82, "gf": 238, "ga": 207, "xgf_a": 223.22, "xga_a": 198.59, "sog_f": 2698, "sog_a": 2415, "fo_pct": 51.3, "hits_f": 1448, "hits_a": 1465, "pk_drawn": 417, "pk_taken": 402, "ev_xgf_pct": 53.0, "ev_cf_pct": 53.0, "ev_ff_pct": 53.0, "ev_xgf": 138.3, "ev_xga": 121.94, "ev_gf": 149, "ev_ga": 121, "ev_hdxgf": 27.95, "ev_hdxga": 23.88, "ev_hdgf": 33, "ev_hdga": 23, "ev_sog_f": 1954, "ev_sog_a": 1784, "ev_toi_min": 3835.8, "pp_gf": 47, "pp_xgf": 49.94, "pp_toi": 471.2, "pp_hdxgf": 24.86, "pp_sog_f": 485, "pk_ga": 58, "pk_xga": 48.55, "pk_toi": 488.6, "pk_hdxga": 29.62, "pk_sog_a": 414}, {"team": "NSH", "gp": 82, "gf": 207, "ga": 228, "xgf_a": 198.45, "xga_a": 219.56, "sog_f": 2375, "sog_a": 2411, "fo_pct": 52.2, "hits_f": 1671, "hits_a": 1467, "pk_drawn": 408, "pk_taken": 382, "ev_xgf_pct": 48.0, "ev_cf_pct": 49.0, "ev_ff_pct": 49.0, "ev_xgf": 131.18, "ev_xga": 144.19, "ev_gf": 134, "ev_ga": 139, "ev_hdxgf": 29.32, "ev_hdxga": 34.35, "ev_hdgf": 28, "ev_hdga": 35, "ev_sog_f": 1760, "ev_sog_a": 1835, "ev_toi_min": 3792.8, "pp_gf": 40, "pp_xgf": 38.12, "pp_toi": 501.9, "pp_hdxgf": 17.64, "pp_sog_f": 384, "pk_ga": 44, "pk_xga": 40.21, "pk_toi": 497.6, "pk_hdxga": 20.4, "pk_sog_a": 333}, {"team": "NYI", "gp": 82, "gf": 198, "ga": 274, "xgf_a": 208.97, "xga_a": 251.2, "sog_f": 2373, "sog_a": 2751, "fo_pct": 45.7, "hits_f": 1828, "hits_a": 1562, "pk_drawn": 446, "pk_taken": 413, "ev_xgf_pct": 45.0, "ev_cf_pct": 46.0, "ev_ff_pct": 46.0, "ev_xgf": 130.0, "ev_xga": 156.43, "ev_gf": 117, "ev_ga": 174, "ev_hdxgf": 28.2, "ev_hdxga": 34.41, "ev_hdgf": 26, "ev_hdga": 30, "ev_sog_f": 1752, "ev_sog_a": 2007, "ev_toi_min": 3736.3, "pp_gf": 48, "pp_xgf": 50.22, "pp_toi": 477.6, "pp_hdxgf": 30.1, "pp_sog_f": 386, "pk_ga": 62, "pk_xga": 54.04, "pk_toi": 528.9, "pk_hdxga": 27.78, "pk_sog_a": 486}, {"team": "NYR", "gp": 82, "gf": 204, "ga": 215, "xgf_a": 226.58, "xga_a": 223.2, "sog_f": 2719, "sog_a": 2490, "fo_pct": 50.8, "hits_f": 2378, "hits_a": 2225, "pk_drawn": 448, "pk_taken": 471, "ev_xgf_pct": 51.0, "ev_cf_pct": 53.0, "ev_ff_pct": 52.0, "ev_xgf": 148.09, "ev_xga": 143.15, "ev_gf": 127, "ev_ga": 145, "ev_hdxgf": 33.57, "ev_hdxga": 30.54, "ev_hdgf": 34, "ev_hdga": 33, "ev_sog_f": 1981, "ev_sog_a": 1812, "ev_toi_min": 3824.9, "pp_gf": 37, "pp_xgf": 41.04, "pp_toi": 507.4, "pp_hdxgf": 15.72, "pp_sog_f": 416, "pk_ga": 33, "pk_xga": 45.02, "pk_toi": 505.8, "pk_hdxga": 23.53, "pk_sog_a": 398}, {"team": "OTT", "gp": 82, "gf": 214, "ga": 232, "xgf_a": 214.88, "xga_a": 217.06, "sog_f": 2434, "sog_a": 2364, "fo_pct": 51.8, "hits_f": 1958, "hits_a": 1897, "pk_drawn": 437, "pk_taken": 426, "ev_xgf_pct": 49.0, "ev_cf_pct": 49.0, "ev_ff_pct": 49.0, "ev_xgf": 130.26, "ev_xga": 133.53, "ev_gf": 126, "ev_ga": 144, "ev_hdxgf": 27.21, "ev_hdxga": 26.06, "ev_hdgf": 20, "ev_hdga": 24, "ev_sog_f": 1717, "ev_sog_a": 1747, "ev_toi_min": 3803.3, "pp_gf": 60, "pp_xgf": 53.98, "pp_toi": 511.6, "pp_hdxgf": 30.58, "pp_sog_f": 430, "pk_ga": 57, "pk_xga": 53.58, "pk_toi": 536.3, "pk_hdxga": 31.24, "pk_sog_a": 406}, {"team": "PHI", "gp": 82, "gf": 260, "ga": 232, "xgf_a": 220.18, "xga_a": 231.19, "sog_f": 2441, "sog_a": 2668, "fo_pct": 48.3, "hits_f": 1712, "hits_a": 1608, "pk_drawn": 525, "pk_taken": 457, "ev_xgf_pct": 48.0, "ev_cf_pct": 48.0, "ev_ff_pct": 48.0, "ev_xgf": 132.62, "ev_xga": 144.4, "ev_gf": 154, "ev_ga": 153, "ev_hdxgf": 30.66, "ev_hdxga": 37.65, "ev_hdgf": 31, "ev_hdga": 39, "ev_sog_f": 1802, "ev_sog_a": 1901, "ev_toi_min": 3698.9, "pp_gf": 62, "pp_xgf": 48.59, "pp_toi": 446.2, "pp_hdxgf": 30.44, "pp_sog_f": 343, "pk_ga": 55, "pk_xga": 56.06, "pk_toi": 577.7, "pk_hdxga": 28.1, "pk_sog_a": 507}, {"team": "PIT", "gp": 82, "gf": 258, "ga": 233, "xgf_a": 228.4, "xga_a": 221.91, "sog_f": 2381, "sog_a": 2484, "fo_pct": 49.1, "hits_f": 1939, "hits_a": 2007, "pk_drawn": 439, "pk_taken": 442, "ev_xgf_pct": 51.0, "ev_cf_pct": 48.0, "ev_ff_pct": 49.0, "ev_xgf": 134.94, "ev_xga": 130.82, "ev_gf": 164, "ev_ga": 139, "ev_hdxgf": 25.3, "ev_hdxga": 24.89, "ev_hdgf": 38, "ev_hdga": 35, "ev_sog_f": 1690, "ev_sog_a": 1776, "ev_toi_min": 3727.1, "pp_gf": 53, "pp_xgf": 50.52, "pp_toi": 526.6, "pp_hdxgf": 24.21, "pp_sog_f": 419, "pk_ga": 56, "pk_xga": 54.4, "pk_toi": 527.5, "pk_hdxga": 32.01, "pk_sog_a": 442}, {"team": "S.J", "gp": 82, "gf": 251, "ga": 199, "xgf_a": 257.29, "xga_a": 193.71, "sog_f": 2720, "sog_a": 2228, "fo_pct": 53.8, "hits_f": 2042, "hits_a": 1948, "pk_drawn": 398, "pk_taken": 451, "ev_xgf_pct": 55.0, "ev_cf_pct": 54.0, "ev_ff_pct": 55.0, "ev_xgf": 148.94, "ev_xga": 120.6, "ev_gf": 131, "ev_ga": 123, "ev_hdxgf": 38.26, "ev_hdxga": 27.65, "ev_hdgf": 38, "ev_hdga": 31, "ev_sog_f": 1945, "ev_sog_a": 1612, "ev_toi_min": 3832.9, "pp_gf": 77, "pp_xgf": 68.5, "pp_toi": 517.4, "pp_hdxgf": 41.9, "pp_sog_f": 510, "pk_ga": 40, "pk_xga": 40.99, "pk_toi": 438.8, "pk_hdxga": 18.65, "pk_sog_a": 351}, {"team": "STL", "gp": 82, "gf": 227, "ga": 227, "xgf_a": 203.66, "xga_a": 206.89, "sog_f": 2271, "sog_a": 2342, "fo_pct": 49.1, "hits_f": 1611, "hits_a": 1651, "pk_drawn": 464, "pk_taken": 459, "ev_xgf_pct": 50.0, "ev_cf_pct": 48.0, "ev_ff_pct": 49.0, "ev_xgf": 123.87, "ev_xga": 125.42, "ev_gf": 130, "ev_ga": 140, "ev_hdxgf": 25.83, "ev_hdxga": 23.87, "ev_hdgf": 25, "ev_hdga": 30, "ev_sog_f": 1621, "ev_sog_a": 1675, "ev_toi_min": 3696.2, "pp_gf": 56, "pp_xgf": 46.77, "pp_toi": 511.2, "pp_hdxgf": 22.96, "pp_sog_f": 403, "pk_ga": 54, "pk_xga": 46.5, "pk_toi": 552.1, "pk_hdxga": 21.05, "pk_sog_a": 447}, {"team": "T.B", "gp": 82, "gf": 210, "ga": 272, "xgf_a": 219.18, "xga_a": 237.54, "sog_f": 2367, "sog_a": 2738, "fo_pct": 50.2, "hits_f": 1874, "hits_a": 1462, "pk_drawn": 494, "pk_taken": 432, "ev_xgf_pct": 49.0, "ev_cf_pct": 48.0, "ev_ff_pct": 48.0, "ev_xgf": 131.17, "ev_xga": 136.78, "ev_gf": 131, "ev_ga": 146, "ev_hdxgf": 23.55, "ev_hdxga": 25.78, "ev_hdgf": 29, "ev_hdga": 27, "ev_sog_f": 1691, "ev_sog_a": 1853, "ev_toi_min": 3706.9, "pp_gf": 57, "pp_xgf": 58.53, "pp_toi": 516.8, "pp_hdxgf": 33.44, "pp_sog_f": 459, "pk_ga": 73, "pk_xga": 56.8, "pk_toi": 589.5, "pk_hdxga": 30.2, "pk_sog_a": 519}, {"team": "TOR", "gp": 81, "gf": 242, "ga": 283, "xgf_a": 240.65, "xga_a": 249.21, "sog_f": 2573, "sog_a": 2459, "fo_pct": 50.1, "hits_f": 1736, "hits_a": 1923, "pk_drawn": 408, "pk_taken": 422, "ev_xgf_pct": 49.0, "ev_cf_pct": 50.0, "ev_ff_pct": 51.0, "ev_xgf": 152.32, "ev_xga": 156.61, "ev_gf": 161, "ev_ga": 177, "ev_hdxgf": 33.54, "ev_hdxga": 33.74, "ev_hdgf": 42, "ev_hdga": 32, "ev_sog_f": 1904, "ev_sog_a": 1819, "ev_toi_min": 3788.4, "pp_gf": 56, "pp_xgf": 59.93, "pp_toi": 487.6, "pp_hdxgf": 36.79, "pp_sog_f": 456, "pk_ga": 71, "pk_xga": 65.64, "pk_toi": 456.4, "pk_hdxga": 42.11, "pk_sog_a": 407}, {"team": "VAN", "gp": 81, "gf": 242, "ga": 208, "xgf_a": 228.25, "xga_a": 215.95, "sog_f": 2299, "sog_a": 2360, "fo_pct": 51.7, "hits_f": 1294, "hits_a": 1549, "pk_drawn": 484, "pk_taken": 489, "ev_xgf_pct": 50.0, "ev_cf_pct": 49.0, "ev_ff_pct": 49.0, "ev_xgf": 131.63, "ev_xga": 131.09, "ev_gf": 150, "ev_ga": 120, "ev_hdxgf": 26.32, "ev_hdxga": 27.95, "ev_hdgf": 26, "ev_hdga": 27, "ev_sog_f": 1632, "ev_sog_a": 1678, "ev_toi_min": 3633.8, "pp_gf": 53, "pp_xgf": 58.99, "pp_toi": 532.2, "pp_hdxgf": 33.1, "pp_sog_f": 459, "pk_ga": 56, "pk_xga": 53.13, "pk_toi": 516.2, "pk_hdxga": 27.58, "pk_sog_a": 407}, {"team": "WSH", "gp": 82, "gf": 268, "ga": 240, "xgf_a": 258.7, "xga_a": 220.94, "sog_f": 2748, "sog_a": 2418, "fo_pct": 51.7, "hits_f": 1662, "hits_a": 1728, "pk_drawn": 445, "pk_taken": 394, "ev_xgf_pct": 55.0, "ev_cf_pct": 55.0, "ev_ff_pct": 55.0, "ev_xgf": 160.35, "ev_xga": 131.14, "ev_gf": 152, "ev_ga": 138, "ev_hdxgf": 29.89, "ev_hdxga": 19.8, "ev_hdgf": 25, "ev_hdga": 22, "ev_sog_f": 2008, "ev_sog_a": 1688, "ev_toi_min": 3744.0, "pp_gf": 78, "pp_xgf": 59.6, "pp_toi": 468.6, "pp_hdxgf": 31.98, "pp_sog_f": 477, "pk_ga": 63, "pk_xga": 60.08, "pk_toi": 556.9, "pk_hdxga": 33.74, "pk_sog_a": 491}];
+const TEAM_HIST = {"MIN": [{"s": "2008-09", "x": 46.0}, {"s": "2009-10", "x": 50.0}, {"s": "2010-11", "x": 45.0}, {"s": "2011-12", "x": 47.0}, {"s": "2012-13", "x": 52.0}, {"s": "2013-14", "x": 51.0}, {"s": "2014-15", "x": 55.0}, {"s": "2015-16", "x": 51.0}, {"s": "2016-17", "x": 55.0}, {"s": "2017-18", "x": 53.0}, {"s": "2018-19", "x": 54.0}, {"s": "2019-20", "x": 53.0}, {"s": "2020-21", "x": 52.0}, {"s": "2021-22", "x": 53.0}, {"s": "2022-23", "x": 50.0}, {"s": "2023-24", "x": 51.0}, {"s": "2024-25", "x": 49.0}, {"s": "2025-26", "x": 52.0}], "BOS": [{"s": "2008-09", "x": 51.0}, {"s": "2009-10", "x": 52.0}, {"s": "2010-11", "x": 49.0}, {"s": "2011-12", "x": 54.0}, {"s": "2012-13", "x": 53.0}, {"s": "2013-14", "x": 54.0}, {"s": "2014-15", "x": 51.0}, {"s": "2015-16", "x": 49.0}, {"s": "2016-17", "x": 54.0}, {"s": "2017-18", "x": 54.0}, {"s": "2018-19", "x": 53.0}, {"s": "2019-20", "x": 52.0}, {"s": "2020-21", "x": 52.0}, {"s": "2021-22", "x": 57.0}, {"s": "2022-23", "x": 54.0}, {"s": "2023-24", "x": 50.0}, {"s": "2024-25", "x": 48.0}, {"s": "2025-26", "x": 47.0}], "ARI": [{"s": "2008-09", "x": 46.0}, {"s": "2009-10", "x": 52.0}, {"s": "2010-11", "x": 49.0}, {"s": "2011-12", "x": 49.0}, {"s": "2012-13", "x": 49.0}, {"s": "2013-14", "x": 47.0}, {"s": "2014-15", "x": 45.0}, {"s": "2015-16", "x": 47.0}, {"s": "2016-17", "x": 42.0}, {"s": "2017-18", "x": 47.0}, {"s": "2018-19", "x": 49.0}, {"s": "2019-20", "x": 50.0}, {"s": "2020-21", "x": 48.0}, {"s": "2021-22", "x": 42.0}, {"s": "2022-23", "x": 45.0}, {"s": "2023-24", "x": 48.0}], "L.A": [{"s": "2008-09", "x": 51.0}, {"s": "2009-10", "x": 52.0}, {"s": "2010-11", "x": 52.0}, {"s": "2011-12", "x": 53.0}, {"s": "2012-13", "x": 55.0}, {"s": "2013-14", "x": 56.0}, {"s": "2014-15", "x": 54.0}, {"s": "2015-16", "x": 55.0}, {"s": "2016-17", "x": 54.0}, {"s": "2017-18", "x": 48.0}, {"s": "2018-19", "x": 48.0}, {"s": "2019-20", "x": 52.0}, {"s": "2020-21", "x": 45.0}], "COL": [{"s": "2008-09", "x": 49.0}, {"s": "2009-10", "x": 48.0}, {"s": "2010-11", "x": 50.0}, {"s": "2011-12", "x": 50.0}, {"s": "2012-13", "x": 49.0}, {"s": "2013-14", "x": 47.0}, {"s": "2014-15", "x": 43.0}, {"s": "2015-16", "x": 44.0}, {"s": "2016-17", "x": 46.0}, {"s": "2017-18", "x": 47.0}, {"s": "2018-19", "x": 50.0}, {"s": "2019-20", "x": 51.0}, {"s": "2020-21", "x": 60.0}, {"s": "2021-22", "x": 53.0}, {"s": "2022-23", "x": 52.0}, {"s": "2023-24", "x": 52.0}, {"s": "2024-25", "x": 53.0}, {"s": "2025-26", "x": 57.0}], "DAL": [{"s": "2008-09", "x": 48.0}, {"s": "2009-10", "x": 49.0}, {"s": "2010-11", "x": 47.0}, {"s": "2011-12", "x": 48.0}, {"s": "2012-13", "x": 47.0}, {"s": "2013-14", "x": 50.0}, {"s": "2014-15", "x": 52.0}, {"s": "2015-16", "x": 52.0}, {"s": "2016-17", "x": 49.0}, {"s": "2017-18", "x": 53.0}, {"s": "2018-19", "x": 51.0}, {"s": "2019-20", "x": 53.0}, {"s": "2020-21", "x": 54.0}, {"s": "2021-22", "x": 52.0}, {"s": "2022-23", "x": 52.0}, {"s": "2023-24", "x": 54.0}, {"s": "2024-25", "x": 50.0}, {"s": "2025-26", "x": 51.0}], "TOR": [{"s": "2008-09", "x": 49.0}, {"s": "2009-10", "x": 54.0}, {"s": "2010-11", "x": 47.0}, {"s": "2011-12", "x": 48.0}, {"s": "2012-13", "x": 44.0}, {"s": "2013-14", "x": 43.0}, {"s": "2014-15", "x": 45.0}, {"s": "2015-16", "x": 50.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 51.0}, {"s": "2018-19", "x": 51.0}, {"s": "2019-20", "x": 51.0}, {"s": "2020-21", "x": 56.0}, {"s": "2021-22", "x": 55.0}, {"s": "2022-23", "x": 54.0}, {"s": "2023-24", "x": 51.0}, {"s": "2024-25", "x": 50.0}, {"s": "2025-26", "x": 46.0}], "CAR": [{"s": "2008-09", "x": 51.0}, {"s": "2009-10", "x": 47.0}, {"s": "2010-11", "x": 48.0}, {"s": "2011-12", "x": 47.0}, {"s": "2012-13", "x": 49.0}, {"s": "2013-14", "x": 48.0}, {"s": "2014-15", "x": 51.0}, {"s": "2015-16", "x": 50.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 53.0}, {"s": "2018-19", "x": 55.0}, {"s": "2019-20", "x": 53.0}, {"s": "2020-21", "x": 54.0}, {"s": "2021-22", "x": 56.0}, {"s": "2022-23", "x": 60.0}, {"s": "2023-24", "x": 56.0}, {"s": "2024-25", "x": 56.0}, {"s": "2025-26", "x": 56.0}], "OTT": [{"s": "2008-09", "x": 49.0}, {"s": "2009-10", "x": 53.0}, {"s": "2010-11", "x": 49.0}, {"s": "2011-12", "x": 49.0}, {"s": "2012-13", "x": 53.0}, {"s": "2013-14", "x": 49.0}, {"s": "2014-15", "x": 51.0}, {"s": "2015-16", "x": 48.0}, {"s": "2016-17", "x": 49.0}, {"s": "2017-18", "x": 46.0}, {"s": "2018-19", "x": 46.0}, {"s": "2019-20", "x": 49.0}, {"s": "2020-21", "x": 47.0}, {"s": "2021-22", "x": 47.0}, {"s": "2022-23", "x": 51.0}, {"s": "2023-24", "x": 49.0}, {"s": "2024-25", "x": 50.0}, {"s": "2025-26", "x": 56.0}], "BUF": [{"s": "2008-09", "x": 51.0}, {"s": "2009-10", "x": 49.0}, {"s": "2010-11", "x": 51.0}, {"s": "2011-12", "x": 47.0}, {"s": "2012-13", "x": 44.0}, {"s": "2013-14", "x": 42.0}, {"s": "2014-15", "x": 40.0}, {"s": "2015-16", "x": 47.0}, {"s": "2016-17", "x": 48.0}, {"s": "2017-18", "x": 46.0}, {"s": "2018-19", "x": 48.0}, {"s": "2019-20", "x": 48.0}, {"s": "2020-21", "x": 46.0}, {"s": "2021-22", "x": 46.0}, {"s": "2022-23", "x": 48.0}, {"s": "2023-24", "x": 48.0}, {"s": "2024-25", "x": 47.0}, {"s": "2025-26", "x": 50.0}], "T.B": [{"s": "2008-09", "x": 49.0}, {"s": "2009-10", "x": 48.0}, {"s": "2010-11", "x": 56.0}, {"s": "2011-12", "x": 49.0}, {"s": "2012-13", "x": 49.0}, {"s": "2013-14", "x": 51.0}, {"s": "2014-15", "x": 55.0}, {"s": "2015-16", "x": 52.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 52.0}, {"s": "2018-19", "x": 53.0}, {"s": "2019-20", "x": 54.0}, {"s": "2020-21", "x": 52.0}], "ANA": [{"s": "2008-09", "x": 52.0}, {"s": "2009-10", "x": 46.0}, {"s": "2010-11", "x": 45.0}, {"s": "2011-12", "x": 48.0}, {"s": "2012-13", "x": 50.0}, {"s": "2013-14", "x": 52.0}, {"s": "2014-15", "x": 52.0}, {"s": "2015-16", "x": 53.0}, {"s": "2016-17", "x": 52.0}, {"s": "2017-18", "x": 49.0}, {"s": "2018-19", "x": 45.0}, {"s": "2019-20", "x": 47.0}, {"s": "2020-21", "x": 46.0}, {"s": "2021-22", "x": 48.0}, {"s": "2022-23", "x": 40.0}, {"s": "2023-24", "x": 47.0}, {"s": "2024-25", "x": 45.0}, {"s": "2025-26", "x": 52.0}], "EDM": [{"s": "2008-09", "x": 49.0}, {"s": "2009-10", "x": 46.0}, {"s": "2010-11", "x": 44.0}, {"s": "2011-12", "x": 47.0}, {"s": "2012-13", "x": 44.0}, {"s": "2013-14", "x": 45.0}, {"s": "2014-15", "x": 44.0}, {"s": "2015-16", "x": 49.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 51.0}, {"s": "2018-19", "x": 47.0}, {"s": "2019-20", "x": 49.0}, {"s": "2020-21", "x": 50.0}, {"s": "2021-22", "x": 51.0}, {"s": "2022-23", "x": 54.0}, {"s": "2023-24", "x": 58.0}, {"s": "2024-25", "x": 55.0}, {"s": "2025-26", "x": 52.0}], "STL": [{"s": "2008-09", "x": 50.0}, {"s": "2009-10", "x": 49.0}, {"s": "2010-11", "x": 51.0}, {"s": "2011-12", "x": 54.0}, {"s": "2012-13", "x": 51.0}, {"s": "2013-14", "x": 54.0}, {"s": "2014-15", "x": 53.0}, {"s": "2015-16", "x": 52.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 52.0}, {"s": "2018-19", "x": 54.0}, {"s": "2019-20", "x": 50.0}, {"s": "2020-21", "x": 46.0}, {"s": "2021-22", "x": 47.0}, {"s": "2022-23", "x": 45.0}, {"s": "2023-24", "x": 44.0}, {"s": "2024-25", "x": 50.0}, {"s": "2025-26", "x": 49.0}], "NYI": [{"s": "2008-09", "x": 45.0}, {"s": "2009-10", "x": 49.0}, {"s": "2010-11", "x": 46.0}, {"s": "2011-12", "x": 49.0}, {"s": "2012-13", "x": 52.0}, {"s": "2013-14", "x": 50.0}, {"s": "2014-15", "x": 55.0}, {"s": "2015-16", "x": 49.0}, {"s": "2016-17", "x": 49.0}, {"s": "2017-18", "x": 47.0}, {"s": "2018-19", "x": 51.0}, {"s": "2019-20", "x": 50.0}, {"s": "2020-21", "x": 54.0}, {"s": "2021-22", "x": 47.0}, {"s": "2022-23", "x": 50.0}, {"s": "2023-24", "x": 50.0}, {"s": "2024-25", "x": 50.0}, {"s": "2025-26", "x": 48.0}], "ATL": [{"s": "2008-09", "x": 47.0}, {"s": "2009-10", "x": 46.0}, {"s": "2010-11", "x": 47.0}], "DET": [{"s": "2008-09", "x": 52.0}, {"s": "2009-10", "x": 52.0}, {"s": "2010-11", "x": 52.0}, {"s": "2011-12", "x": 55.0}, {"s": "2012-13", "x": 52.0}, {"s": "2013-14", "x": 50.0}, {"s": "2014-15", "x": 52.0}, {"s": "2015-16", "x": 49.0}, {"s": "2016-17", "x": 48.0}, {"s": "2017-18", "x": 48.0}, {"s": "2018-19", "x": 45.0}, {"s": "2019-20", "x": 45.0}, {"s": "2020-21", "x": 45.0}, {"s": "2021-22", "x": 46.0}, {"s": "2022-23", "x": 47.0}, {"s": "2023-24", "x": 46.0}, {"s": "2024-25", "x": 48.0}, {"s": "2025-26", "x": 49.0}], "NSH": [{"s": "2008-09", "x": 48.0}, {"s": "2009-10", "x": 50.0}, {"s": "2010-11", "x": 50.0}, {"s": "2011-12", "x": 50.0}, {"s": "2012-13", "x": 51.0}, {"s": "2013-14", "x": 51.0}, {"s": "2014-15", "x": 55.0}, {"s": "2015-16", "x": 53.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 51.0}, {"s": "2018-19", "x": 51.0}, {"s": "2019-20", "x": 50.0}, {"s": "2020-21", "x": 50.0}, {"s": "2021-22", "x": 50.0}, {"s": "2022-23", "x": 48.0}, {"s": "2023-24", "x": 53.0}, {"s": "2024-25", "x": 50.0}, {"s": "2025-26", "x": 49.0}], "VAN": [{"s": "2008-09", "x": 50.0}, {"s": "2009-10", "x": 51.0}, {"s": "2010-11", "x": 50.0}, {"s": "2011-12", "x": 48.0}, {"s": "2012-13", "x": 50.0}, {"s": "2013-14", "x": 50.0}, {"s": "2014-15", "x": 48.0}, {"s": "2015-16", "x": 44.0}, {"s": "2016-17", "x": 46.0}, {"s": "2017-18", "x": 46.0}, {"s": "2018-19", "x": 46.0}, {"s": "2019-20", "x": 48.0}, {"s": "2020-21", "x": 45.0}, {"s": "2021-22", "x": 49.0}, {"s": "2022-23", "x": 46.0}, {"s": "2023-24", "x": 52.0}, {"s": "2024-25", "x": 49.0}, {"s": "2025-26", "x": 44.0}], "PIT": [{"s": "2008-09", "x": 51.0}, {"s": "2009-10", "x": 53.0}, {"s": "2010-11", "x": 51.0}, {"s": "2011-12", "x": 54.0}, {"s": "2012-13", "x": 51.0}, {"s": "2013-14", "x": 50.0}, {"s": "2014-15", "x": 52.0}, {"s": "2015-16", "x": 55.0}, {"s": "2016-17", "x": 52.0}, {"s": "2017-18", "x": 52.0}, {"s": "2018-19", "x": 52.0}, {"s": "2019-20", "x": 51.0}, {"s": "2020-21", "x": 49.0}, {"s": "2021-22", "x": 53.0}, {"s": "2022-23", "x": 53.0}, {"s": "2023-24", "x": 52.0}, {"s": "2024-25", "x": 49.0}, {"s": "2025-26", "x": 51.0}], "CHI": [{"s": "2008-09", "x": 53.0}, {"s": "2009-10", "x": 57.0}, {"s": "2010-11", "x": 52.0}, {"s": "2011-12", "x": 52.0}, {"s": "2012-13", "x": 53.0}, {"s": "2013-14", "x": 56.0}, {"s": "2014-15", "x": 51.0}, {"s": "2015-16", "x": 48.0}, {"s": "2016-17", "x": 49.0}, {"s": "2017-18", "x": 50.0}, {"s": "2018-19", "x": 45.0}, {"s": "2019-20", "x": 47.0}, {"s": "2020-21", "x": 45.0}, {"s": "2021-22", "x": 47.0}, {"s": "2022-23", "x": 43.0}, {"s": "2023-24", "x": 43.0}, {"s": "2024-25", "x": 43.0}, {"s": "2025-26", "x": 42.0}], "N.J": [{"s": "2008-09", "x": 53.0}, {"s": "2009-10", "x": 51.0}, {"s": "2010-11", "x": 51.0}, {"s": "2011-12", "x": 52.0}, {"s": "2012-13", "x": 56.0}, {"s": "2013-14", "x": 56.0}, {"s": "2014-15", "x": 47.0}, {"s": "2015-16", "x": 48.0}, {"s": "2016-17", "x": 48.0}, {"s": "2017-18", "x": 50.0}, {"s": "2018-19", "x": 49.0}, {"s": "2019-20", "x": 47.0}, {"s": "2020-21", "x": 49.0}], "PHI": [{"s": "2008-09", "x": 48.0}, {"s": "2009-10", "x": 52.0}, {"s": "2010-11", "x": 51.0}, {"s": "2011-12", "x": 52.0}, {"s": "2012-13", "x": 48.0}, {"s": "2013-14", "x": 50.0}, {"s": "2014-15", "x": 48.0}, {"s": "2015-16", "x": 49.0}, {"s": "2016-17", "x": 49.0}, {"s": "2017-18", "x": 50.0}, {"s": "2018-19", "x": 49.0}, {"s": "2019-20", "x": 51.0}, {"s": "2020-21", "x": 51.0}, {"s": "2021-22", "x": 46.0}, {"s": "2022-23", "x": 48.0}, {"s": "2023-24", "x": 52.0}, {"s": "2024-25", "x": 53.0}, {"s": "2025-26", "x": 51.0}], "CBJ": [{"s": "2008-09", "x": 52.0}, {"s": "2009-10", "x": 48.0}, {"s": "2010-11", "x": 51.0}, {"s": "2011-12", "x": 49.0}, {"s": "2012-13", "x": 46.0}, {"s": "2013-14", "x": 51.0}, {"s": "2014-15", "x": 48.0}, {"s": "2015-16", "x": 51.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 52.0}, {"s": "2018-19", "x": 51.0}, {"s": "2019-20", "x": 52.0}, {"s": "2020-21", "x": 46.0}, {"s": "2021-22", "x": 45.0}, {"s": "2022-23", "x": 43.0}, {"s": "2023-24", "x": 45.0}, {"s": "2024-25", "x": 48.0}, {"s": "2025-26", "x": 52.0}], "WSH": [{"s": "2008-09", "x": 55.0}, {"s": "2009-10", "x": 51.0}, {"s": "2010-11", "x": 52.0}, {"s": "2011-12", "x": 50.0}, {"s": "2012-13", "x": 49.0}, {"s": "2013-14", "x": 47.0}, {"s": "2014-15", "x": 53.0}, {"s": "2015-16", "x": 52.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 47.0}, {"s": "2018-19", "x": 47.0}, {"s": "2019-20", "x": 50.0}, {"s": "2020-21", "x": 51.0}, {"s": "2021-22", "x": 50.0}, {"s": "2022-23", "x": 50.0}, {"s": "2023-24", "x": 47.0}, {"s": "2024-25", "x": 52.0}, {"s": "2025-26", "x": 50.0}], "NYR": [{"s": "2008-09", "x": 51.0}, {"s": "2009-10", "x": 49.0}, {"s": "2010-11", "x": 54.0}, {"s": "2011-12", "x": 51.0}, {"s": "2012-13", "x": 54.0}, {"s": "2013-14", "x": 51.0}, {"s": "2014-15", "x": 50.0}, {"s": "2015-16", "x": 47.0}, {"s": "2016-17", "x": 49.0}, {"s": "2017-18", "x": 47.0}, {"s": "2018-19", "x": 48.0}, {"s": "2019-20", "x": 47.0}, {"s": "2020-21", "x": 48.0}, {"s": "2021-22", "x": 47.0}, {"s": "2022-23", "x": 48.0}, {"s": "2023-24", "x": 49.0}, {"s": "2024-25", "x": 48.0}, {"s": "2025-26", "x": 48.0}], "CGY": [{"s": "2008-09", "x": 54.0}, {"s": "2009-10", "x": 50.0}, {"s": "2010-11", "x": 53.0}, {"s": "2011-12", "x": 49.0}, {"s": "2012-13", "x": 48.0}, {"s": "2013-14", "x": 47.0}, {"s": "2014-15", "x": 47.0}, {"s": "2015-16", "x": 50.0}, {"s": "2016-17", "x": 48.0}, {"s": "2017-18", "x": 53.0}, {"s": "2018-19", "x": 53.0}, {"s": "2019-20", "x": 51.0}, {"s": "2020-21", "x": 53.0}, {"s": "2021-22", "x": 55.0}, {"s": "2022-23", "x": 55.0}, {"s": "2023-24", "x": 50.0}, {"s": "2024-25", "x": 49.0}, {"s": "2025-26", "x": 47.0}], "S.J": [{"s": "2008-09", "x": 55.0}, {"s": "2009-10", "x": 51.0}, {"s": "2010-11", "x": 57.0}, {"s": "2011-12", "x": 54.0}, {"s": "2012-13", "x": 54.0}, {"s": "2013-14", "x": 57.0}, {"s": "2014-15", "x": 51.0}, {"s": "2015-16", "x": 55.0}, {"s": "2016-17", "x": 52.0}, {"s": "2017-18", "x": 51.0}, {"s": "2018-19", "x": 54.0}, {"s": "2019-20", "x": 49.0}, {"s": "2020-21", "x": 49.0}], "MTL": [{"s": "2008-09", "x": 47.0}, {"s": "2009-10", "x": 46.0}, {"s": "2010-11", "x": 50.0}, {"s": "2011-12", "x": 47.0}, {"s": "2012-13", "x": 55.0}, {"s": "2013-14", "x": 48.0}, {"s": "2014-15", "x": 49.0}, {"s": "2015-16", "x": 51.0}, {"s": "2016-17", "x": 53.0}, {"s": "2017-18", "x": 51.0}, {"s": "2018-19", "x": 53.0}, {"s": "2019-20", "x": 54.0}, {"s": "2020-21", "x": 53.0}, {"s": "2021-22", "x": 46.0}, {"s": "2022-23", "x": 44.0}, {"s": "2023-24", "x": 47.0}, {"s": "2024-25", "x": 47.0}, {"s": "2025-26", "x": 48.0}], "FLA": [{"s": "2008-09", "x": 47.0}, {"s": "2009-10", "x": 45.0}, {"s": "2010-11", "x": 52.0}, {"s": "2011-12", "x": 48.0}, {"s": "2012-13", "x": 47.0}, {"s": "2013-14", "x": 50.0}, {"s": "2014-15", "x": 52.0}, {"s": "2015-16", "x": 49.0}, {"s": "2016-17", "x": 47.0}, {"s": "2017-18", "x": 49.0}, {"s": "2018-19", "x": 48.0}, {"s": "2019-20", "x": 49.0}, {"s": "2020-21", "x": 54.0}, {"s": "2021-22", "x": 56.0}, {"s": "2022-23", "x": 54.0}, {"s": "2023-24", "x": 54.0}, {"s": "2024-25", "x": 55.0}, {"s": "2025-26", "x": 49.0}], "WPG": [{"s": "2011-12", "x": 51.0}, {"s": "2012-13", "x": 49.0}, {"s": "2013-14", "x": 51.0}, {"s": "2014-15", "x": 52.0}, {"s": "2015-16", "x": 51.0}, {"s": "2016-17", "x": 51.0}, {"s": "2017-18", "x": 53.0}, {"s": "2018-19", "x": 47.0}, {"s": "2019-20", "x": 44.0}, {"s": "2020-21", "x": 46.0}, {"s": "2021-22", "x": 49.0}, {"s": "2022-23", "x": 52.0}, {"s": "2023-24", "x": 51.0}, {"s": "2024-25", "x": 53.0}, {"s": "2025-26", "x": 48.0}], "VGK": [{"s": "2017-18", "x": 50.0}, {"s": "2018-19", "x": 55.0}, {"s": "2019-20", "x": 56.0}, {"s": "2020-21", "x": 53.0}, {"s": "2021-22", "x": 52.0}, {"s": "2022-23", "x": 52.0}, {"s": "2023-24", "x": 52.0}, {"s": "2024-25", "x": 53.0}, {"s": "2025-26", "x": 54.0}], "SJS": [{"s": "2021-22", "x": 47.0}, {"s": "2022-23", "x": 50.0}, {"s": "2023-24", "x": 41.0}, {"s": "2024-25", "x": 44.0}, {"s": "2025-26", "x": 48.0}], "TBL": [{"s": "2021-22", "x": 52.0}, {"s": "2022-23", "x": 51.0}, {"s": "2023-24", "x": 50.0}, {"s": "2024-25", "x": 51.0}, {"s": "2025-26", "x": 54.0}], "LAK": [{"s": "2021-22", "x": 53.0}, {"s": "2022-23", "x": 53.0}, {"s": "2023-24", "x": 55.0}, {"s": "2024-25", "x": 55.0}, {"s": "2025-26", "x": 52.0}], "NJD": [{"s": "2021-22", "x": 51.0}, {"s": "2022-23", "x": 56.0}, {"s": "2023-24", "x": 52.0}, {"s": "2024-25", "x": 52.0}, {"s": "2025-26", "x": 50.0}], "SEA": [{"s": "2021-22", "x": 48.0}, {"s": "2022-23", "x": 52.0}, {"s": "2023-24", "x": 51.0}, {"s": "2024-25", "x": 46.0}, {"s": "2025-26", "x": 46.0}], "UTA": [{"s": "2024-25", "x": 53.0}, {"s": "2025-26", "x": 52.0}]};
+const SEASON = '2008-09';
+let SORT_COL = 'ev_xgf_pct', SORT_DIR = 1;
+let currentTeam = null;
+
+function pCls(v)       { return v>=52?'c-green':v<=48?'c-red':'c-muted'; }
+function gCls(gf,ga)   { return gf>ga?'c-green':gf<ga?'c-red':'c-muted'; }
+function bCls(gf,ga)   { return ga<gf?'c-green':ga>gf?'c-red':'c-muted'; }
+function pBar(v,lo=45,hi=55) { return v>=hi?'bar-green':v<=lo?'bar-red':'bar-blue'; }
+function xgfHex(v)     { return v>=52?'#2dc653':v<=48?'#e63946':'#e2e8f0'; }
+function diffHex(d)    { return d>0?'#2dc653':d<0?'#e63946':'#e2e8f0'; }
+
+function render() {
+  const data = [...TEAMS].sort((a,b) => {
+    const av = a[SORT_COL] ?? -Infinity;
+    const bv = b[SORT_COL] ?? -Infinity;
+    return SORT_DIR * (bv - av);
+  });
+  document.getElementById('row-count').textContent = data.length + ' teams';
+  document.querySelectorAll('#lb th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.dataset.k === SORT_COL) th.classList.add(SORT_DIR === -1 ? 'sort-desc' : 'sort-asc');
+  });
+  const n  = (v, d=1) => v != null ? (+v).toFixed(d) : '—';
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = data.map((r,i) => `<tr>
+    <td class="sc1 rank-c">${i+1}</td>
+    <td class="sc2 name-c">${r.team}</td>
+    <td class="num grp-l">${r.gp}</td>
+    <td class="num grp-l ${pCls(r.ev_xgf_pct)}">${n(r.ev_xgf_pct)}%</td>
+    <td class="num ${pCls(r.ev_cf_pct)}">${n(r.ev_cf_pct)}%</td>
+    <td class="num ${pCls(r.ev_ff_pct)}">${n(r.ev_ff_pct)}%</td>
+    <td class="num ${gCls(r.ev_gf,r.ev_ga)}">${r.ev_gf}</td>
+    <td class="num ${bCls(r.ev_gf,r.ev_ga)}">${r.ev_ga}</td>
+    <td class="num">${n(r.ev_xgf)}</td>
+    <td class="num">${n(r.ev_xga)}</td>
+    <td class="num">${n(r.ev_hdxgf)}</td>
+    <td class="num">${n(r.ev_hdxga)}</td>
+    <td class="num">${r.ev_hdgf}</td>
+    <td class="num">${r.ev_hdga}</td>
+    <td class="num">${n(r.ev_toi_min, 0)} min</td>
+    <td class="num grp-l ${r.pp_gf>=50?'c-green':r.pp_gf<30?'c-red':'c-muted'}">${r.pp_gf}</td>
+    <td class="num">${n(r.pp_xgf)}</td>
+    <td class="num">${n(r.pp_hdxgf)}</td>
+    <td class="num">${r.pp_sog_f}</td>
+    <td class="num">${n(r.pp_toi, 0)} min</td>
+    <td class="num grp-l ${r.pk_ga<=25?'c-green':r.pk_ga>=45?'c-red':'c-muted'}">${r.pk_ga}</td>
+    <td class="num">${n(r.pk_xga)}</td>
+    <td class="num">${n(r.pk_hdxga)}</td>
+    <td class="num">${r.pk_sog_a}</td>
+    <td class="num">${n(r.pk_toi, 0)} min</td>
+    <td class="num grp-l ${gCls(r.gf,r.ga)}">${r.gf}</td>
+    <td class="num ${bCls(r.gf,r.ga)}">${r.ga}</td>
+    <td class="num">${n(r.xgf_a)}</td>
+    <td class="num">${n(r.xga_a)}</td>
+    <td class="num">${r.sog_f}</td>
+    <td class="num">${r.sog_a}</td>
+    <td class="num ${pCls(r.fo_pct)}">${n(r.fo_pct)}%</td>
+    <td class="num">${r.hits_f}</td>
+    <td class="num">${r.pk_drawn}</td>
+    <td class="num">${r.pk_taken}</td>
+  </tr>`).join('');
+  tbody.querySelectorAll('tr').forEach((tr,i) => {
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', () => showCard(data[i]));
+  });
+}
+
+document.querySelectorAll('#lb th').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.k;
+    if (!k || k === 'rank') return;
+    if (SORT_COL === k) SORT_DIR *= -1; else { SORT_COL = k; SORT_DIR = -1; }
+    render();
+  });
+});
+
+/* ── Nav filtering ── */
+const navSel = document.querySelector('.site-nav select');
+let origOptions = [];
+if (navSel) {
+  origOptions = [...navSel.options].map(o => ({v:o.value, t:o.text, s:o.selected}));
+  navSel.onchange = function() { location.href = this.value; };
+}
+function updateNavForTeam(r) {
+  if (!navSel || !origOptions.length) return;
+  const hist = TEAM_HIST[r.team] || [];
+  const teamSeasons = new Set(hist.map(e => e.s));
+  navSel.innerHTML = '';
+  origOptions.forEach(opt => {
+    if (!teamSeasons.has(opt.t)) return;
+    const o = document.createElement('option');
+    o.value = opt.v + '#t=' + encodeURIComponent(r.team);
+    o.text = opt.t; o.selected = opt.t === SEASON;
+    navSel.appendChild(o);
+  });
+}
+function restoreNav() {
+  if (!navSel || !origOptions.length) return;
+  navSel.innerHTML = '';
+  origOptions.forEach(opt => {
+    const o = document.createElement('option');
+    o.value = opt.v; o.text = opt.t; o.selected = opt.s;
+    navSel.appendChild(o);
+  });
+}
+
+/* ── Card helpers ── */
+function sb(lbl,val,cls='') {
+  return `<div class="stat-box"><div class="sv ${cls}">${val}</div><div class="sl">${lbl}</div></div>`;
+}
+function barRow(lbl,val,pct,barCls) {
+  pct=Math.max(0,Math.min(100,pct));
+  return `<div class="bar-row"><div class="bar-top"><span class="bar-lbl">${lbl}</span><span class="bar-val">${val}</span></div><div class="bar-track"><div class="bar-fill ${barCls}" style="width:${pct}%"></div></div></div>`;
+}
+
+/* ── Team Card renderer ── */
+function renderTeamCard(r) {
+  const diff=r.gf-r.ga; const dStr=(diff>=0?'+':'')+diff;
+  const evDiff=r.ev_gf-r.ev_ga; const evDStr=(evDiff>=0?'+':'')+evDiff;
+  return `
+  <div class="player-card">
+    <div class="card-header">
+      <div class="avatar">${r.team}</div>
+      <div class="player-info">
+        <h2>${r.team}</h2>
+        <div class="player-meta">
+          <span class="meta-b">${SEASON}</span>
+          <span class="meta-b">${r.gp} GP</span>
+          <span class="meta-b">${r.gf} GF – ${r.ga} GA &nbsp;<span style="color:${diffHex(diff)}">${dStr}</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="war-summary">
+      <div class="war-big highlight">
+        <div class="lbl">xGF%</div>
+        <div class="val" style="color:${xgfHex(r.ev_xgf_pct)}">${r.ev_xgf_pct.toFixed(1)}%</div>
+        <div class="sub">5-on-5</div>
+      </div>
+      <div class="war-big">
+        <div class="lbl">EV Goal Diff</div>
+        <div class="val" style="color:${diffHex(evDiff)}">${evDStr}</div>
+        <div class="sub">${r.ev_gf} GF – ${r.ev_ga} GA</div>
+      </div>
+      <div class="war-big">
+        <div class="lbl">PP GF</div>
+        <div class="val" style="color:${r.pp_gf>=50?'#2dc653':r.pp_gf<30?'#e63946':'#e2e8f0'}">${r.pp_gf}</div>
+        <div class="sub">Power Play</div>
+      </div>
+      <div class="war-big">
+        <div class="lbl">PK GA</div>
+        <div class="val" style="color:${r.pk_ga<=25?'#2dc653':r.pk_ga>=45?'#e63946':'#e2e8f0'}">${r.pk_ga}</div>
+        <div class="sub">Penalty Kill</div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div>
+        <div class="section-title">5-on-5 (Even Strength)</div>
+        ${barRow('xGF%',r.ev_xgf_pct.toFixed(1)+'%',r.ev_xgf_pct*2,pBar(r.ev_xgf_pct))}
+        ${barRow('CF%', r.ev_cf_pct.toFixed(1)+'%', r.ev_cf_pct*2, pBar(r.ev_cf_pct))}
+        ${barRow('FF%', r.ev_ff_pct.toFixed(1)+'%', r.ev_ff_pct*2, pBar(r.ev_ff_pct))}
+        <div class="stat-grid" style="margin-top:14px">
+          ${sb('EV GF',  r.ev_gf,  r.ev_gf>r.ev_ga?'c-green':r.ev_gf<r.ev_ga?'c-red':'')}
+          ${sb('EV GA',  r.ev_ga,  r.ev_ga<r.ev_gf?'c-green':r.ev_ga>r.ev_gf?'c-red':'')}
+          ${sb('xGF',   r.ev_xgf.toFixed(1))}
+          ${sb('xGA',   r.ev_xga.toFixed(1))}
+          ${sb('HDxGF', r.ev_hdxgf.toFixed(1))}
+          ${sb('HDxGA', r.ev_hdxga.toFixed(1))}
+          ${sb('HDGF',  r.ev_hdgf)}
+          ${sb('HDGA',  r.ev_hdga)}
+          ${sb('TOI',   r.ev_toi_min.toFixed(0)+' min')}
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Power Play</div>
+        <div class="stat-grid">
+          ${sb('PP GF',    r.pp_gf,  r.pp_gf>=50?'c-green':r.pp_gf<30?'c-red':'')}
+          ${sb('PP xGF',   r.pp_xgf.toFixed(1))}
+          ${sb('PP HDxGF', r.pp_hdxgf.toFixed(1))}
+          ${sb('PP SOG',   r.pp_sog_f)}
+          ${sb('PP TOI',   r.pp_toi.toFixed(0)+' min')}
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Penalty Kill</div>
+        <div class="stat-grid">
+          ${sb('PK GA',    r.pk_ga,  r.pk_ga<=25?'c-green':r.pk_ga>=45?'c-red':'')}
+          ${sb('PK xGA',   r.pk_xga.toFixed(1))}
+          ${sb('PK HDxGA', r.pk_hdxga.toFixed(1))}
+          ${sb('PK SOG',   r.pk_sog_a)}
+          ${sb('PK TOI',   r.pk_toi.toFixed(0)+' min')}
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Overall</div>
+        <div class="stat-grid">
+          ${sb('GF',         r.gf,  r.gf>r.ga?'c-green':r.gf<r.ga?'c-red':'')}
+          ${sb('GA',         r.ga,  r.ga<r.gf?'c-green':r.ga>r.gf?'c-red':'')}
+          ${sb('xGF',        r.xgf_a.toFixed(1))}
+          ${sb('xGA',        r.xga_a.toFixed(1))}
+          ${sb('SOG For',    r.sog_f)}
+          ${sb('SOG Agnst',  r.sog_a)}
+          ${sb('FO%',        r.fo_pct.toFixed(1)+'%', pCls(r.fo_pct))}
+          ${sb('Hits For',   r.hits_f)}
+          ${sb('Pens Drawn', r.pk_drawn)}
+          ${sb('Pens Taken', r.pk_taken)}
+        </div>
+      </div>
+      ${renderXGFChart(r.team)}
+    </div>
+  </div>`;
+}
+
+function showCard(r) {
+  currentTeam = r;
+  history.replaceState(null, '', '#t=' + encodeURIComponent(r.team));
+  updateNavForTeam(r);
+  document.getElementById('leaderboard-area').style.display = 'none';
+  document.getElementById('card-area').style.display = 'block';
+  document.getElementById('card-inner').innerHTML = renderTeamCard(r);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.getElementById('back-btn').addEventListener('click', () => {
+  currentTeam = null;
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+  restoreNav();
+  document.getElementById('card-area').style.display = 'none';
+  document.getElementById('leaderboard-area').style.display = 'block';
+  searchEl.value = ''; acBox.style.display = 'none';
+});
+
+function renderXGFChart(teamName) {
+  const hist = TEAM_HIST[teamName];
+  if (!hist || hist.length < 2) return '';
+  const W=480,H=110,PL=38,PR=8,PT=12,PB=28;
+  const plotW=W-PL-PR, plotH=H-PT-PB;
+  const vals=hist.map(e=>e.x);
+  const minV=Math.min(...vals,44), maxV=Math.max(...vals,56);
+  const range=maxV-minV||1;
+  const step=plotW/hist.length;
+  const barW=Math.max(4,Math.floor(step)-2);
+  const fiftyY=PT+plotH*((maxV-50)/range);
+  const cid='xtt_'+teamName.replace(/\W/g,'_');
+  let bars='',labels='';
+  hist.forEach((e,i)=>{
+    const cx=PL+i*step+step/2;
+    const isCur=e.s===SEASON;
+    const valH=(e.x-50)/range*plotH;
+    const bh=Math.abs(valH);
+    const y=valH>=0?fiftyY-valH:fiftyY;
+    const col=isCur?'#00b4d8':e.x>=50?'#2dc653':'#e63946';
+    const tip=e.s+': '+e.x.toFixed(1)+'% xGF';
+    bars+=`<rect x="${(cx-step/2+1).toFixed(1)}" y="${PT}" width="${(step-2).toFixed(1)}" height="${plotH}" fill="transparent" style="cursor:default" onmouseover="(function(){var t=document.getElementById('${cid}');if(t){t.style.display='block';t.textContent='${tip}'}})()" onmouseout="(function(){var t=document.getElementById('${cid}');if(t)t.style.display='none'})()"/>`;
+    bars+=`<rect x="${(cx-barW/2).toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${Math.max(1,bh).toFixed(1)}" fill="${col}" rx="1" opacity="${isCur?1:0.65}" pointer-events="none"/>`;
+    if(isCur||i%Math.max(1,Math.round(hist.length/6))===0){
+      const yr=e.s.slice(2,4)+'-'+e.s.slice(7);
+      labels+=`<text x="${cx.toFixed(1)}" y="${(H-4).toFixed(1)}" text-anchor="middle" font-size="8" fill="${isCur?'#00b4d8':'#64748b'}" pointer-events="none">${yr}</text>`;
+    }
+  });
+  const zLine=`<line x1="${PL}" y1="${fiftyY.toFixed(1)}" x2="${W-PR}" y2="${fiftyY.toFixed(1)}" stroke="#2a3a50" stroke-width="1" stroke-dasharray="3,3" pointer-events="none"/>`;
+  const lbl50=`<text x="${(PL-3)}" y="${(fiftyY+3).toFixed(1)}" text-anchor="end" font-size="8" fill="#64748b" pointer-events="none">50%</text>`;
+  const lblMax=`<text x="${(PL-3)}" y="${(PT+8)}" text-anchor="end" font-size="8" fill="#64748b" pointer-events="none">${maxV.toFixed(0)}%</text>`;
+  return `<div class="section-title" style="margin-top:4px">xGF% History</div>
+<div style="position:relative;margin-top:8px">
+  <div id="${cid}" style="display:none;position:absolute;top:0;left:50%;transform:translateX(-50%);background:#1e2a3a;border:1px solid #2a3a50;border-radius:6px;padding:3px 10px;font-size:0.76rem;color:#e2e8f0;white-space:nowrap;z-index:10;pointer-events:none"></div>
+  <div style="overflow-x:auto"><svg width="100%" viewBox="0 0 ${W} ${H}" style="max-width:${W}px;display:block">${zLine}${lbl50}${lblMax}${bars}${labels}</svg></div>
+</div>`;
+}
+
+/* ── Search ── */
+const searchEl=document.getElementById('search');
+const acBox=document.getElementById('ac-box');
+searchEl.addEventListener('input',()=>{
+  const q=searchEl.value.trim().toUpperCase();
+  if(!q){acBox.style.display='none';return;}
+  const hits=TEAMS.filter(r=>r.team.toUpperCase().includes(q));
+  if(!hits.length){acBox.style.display='none';return;}
+  acBox.innerHTML=hits.map(r=>`<div class="ac-item" data-t="${r.team}">${r.team}</div>`).join('');
+  acBox.style.display='block';
+  acBox.querySelectorAll('.ac-item').forEach(el=>el.addEventListener('click',()=>{
+    const t=el.dataset.t; const team=TEAMS.find(r=>r.team===t);
+    if(team){showCard(team); searchEl.value=''; acBox.style.display='none';}
+  }));
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))acBox.style.display='none';});
+
+render();
+
+/* ── Auto-open from URL hash ── */
+(function() {
+  const hash = location.hash;
+  if (!hash.startsWith('#t=')) return;
+  const tname = decodeURIComponent(hash.slice(3));
+  const team = TEAMS.find(r => r.team === tname);
+  if (team) showCard(team);
+})();
+</script>
+</body>
+</html>
