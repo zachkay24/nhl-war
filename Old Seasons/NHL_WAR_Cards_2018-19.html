@@ -481,6 +481,16 @@
 <div class="footer">Generated 2026-04-21 11:05 · Data: skaters.csv + goalies.csv</div>
 
 <script>
+var TEAM_BG={
+  ANA:'F47A38,B9975B',BOS:'FFB81C,8a6600',BUF:'FCB514,00338D',CAR:'FF3333,8B0000',
+  CBJ:'002654,CE1126',CGY:'C8102E,F1BE48',CHI:'CF0A2C,FF0000',COL:'6F263D,236192',
+  DAL:'006847,8B8B8B',DET:'CE1126,8B0000',EDM:'FF4C00,003DA5',FLA:'C8102E,041E42',
+  LAK:'A2AAAD,000000',MIN:'154734,A6192E',MTL:'AF1E2D,192168',NJD:'CE1126,003DA5',
+  NSH:'FFB81C,041E42',NYI:'00539B,F47D30',NYR:'0038A8,CE1126',OTT:'C52032,C69214',
+  PHI:'F74902,000000',PIT:'FCB514,000000',SEA:'99D9D9,001628',SJS:'006D75,EA7200',
+  STL:'FCB514,002F87',TBL:'002868,4080CC',TOR:'4080CC,003E7E',UTA:'53565A,010101',
+  VAN:'00843D,00205B',VGK:'B4975A,333F42',WSH:'C8102E,041E42',WPG:'4080CC,041E42'
+};
 var TEAM_C={
   ANA:'#F47A38',BOS:'#FFB81C',BUF:'#FCB514',CAR:'#FF3333',CBJ:'#FF3333',
   CGY:'#E8102E',CHI:'#FF2030',COL:'#8B4060',DAL:'#00a85a',DET:'#FF2030',
@@ -917,7 +927,7 @@ function renderSkaterCard(p) {
   return `
     <div class="player-card">
       <div class="card-header">
-        <div class="avatar">${initials(p.name)}<img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+        <div class="avatar" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[p.team]||'0077b6,00b4d8').split(',')[0]},${'#'+(TEAM_BG[p.team]||'0077b6,00b4d8').split(',')[1]})"><img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.45);transform-origin:50% 22%" onerror="this.style.display='none'"></div>
         <div class="player-info">
           <h2>${p.name}</h2>
           <div class="player-meta">
@@ -1031,7 +1041,7 @@ function renderGoalieCard(p) {
   return `
     <div class="player-card">
       <div class="card-header">
-        <div class="avatar goalie">${initials(p.name)}<img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+        <div class="avatar goalie" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[p.team]||'6a0dad,9b59b6').split(',')[0]},${'#'+(TEAM_BG[p.team]||'6a0dad,9b59b6').split(',')[1]})"><img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;transform:scale(1.45);transform-origin:50% 22%" onerror="this.style.display='none'"></div>
         <div class="player-info">
           <h2>${p.name}</h2>
           <div class="player-meta">
