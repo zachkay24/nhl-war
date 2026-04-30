@@ -22,6 +22,7 @@
   .site-nav {
     display: flex; justify-content: center; align-items: center;
     gap: 6px; flex-wrap: wrap; padding: 20px 16px 0; margin-bottom: 28px;
+    position: relative;
   }
   .site-nav .brand {
     font-weight: 900; font-size: 0.82rem; letter-spacing: 2px; text-transform: uppercase;
@@ -237,7 +238,7 @@
   <a href="NHL_WAR_Teams_2021-22.html" class="active">Teams</a>
   <a href="NHL_WAR_Lines_2021-22.html">Lines</a>
   <a href="../NHL_WAR_About.html">About</a>
-  <select onchange="location.href=this.value" style="padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:0.82rem;cursor:pointer;outline:none;font-weight:600;">
+  <select onchange="location.href=this.value" style="position:absolute;right:0;top:50%;transform:translateY(-50%);padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surf2);color:var(--text);font-size:0.82rem;cursor:pointer;outline:none;font-weight:600;">
     <option value="../NHL_WAR_Teams.html">2025-26</option>
     <option value="NHL_WAR_Teams_2024-25.html">2024-25</option>
     <option value="NHL_WAR_Teams_2023-24.html">2023-24</option>
