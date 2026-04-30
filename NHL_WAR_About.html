@@ -18,13 +18,20 @@
     min-height: 100vh; padding: 24px 16px 64px;
   }
 
-  /* Nav */
+  .top-bar { height: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent), var(--gold)); }
   .site-nav {
-    display: flex; justify-content: center; gap: 6px;
-    margin: 0 auto 36px; max-width: 600px; flex-wrap: wrap;
+    display: flex; justify-content: center; align-items: center;
+    gap: 6px; flex-wrap: wrap; padding: 20px 16px 0; margin-bottom: 28px;
   }
+  .site-nav .brand {
+    font-weight: 900; font-size: 0.82rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); text-decoration: none; padding: 8px 16px; border-radius: 50px;
+    background: rgba(0,180,216,0.1); border: 1px solid rgba(0,180,216,0.3);
+    transition: all 0.15s; margin-right: 6px;
+  }
+  .site-nav .brand:hover { background: rgba(0,180,216,0.2); border-color: var(--accent); }
   .site-nav a {
-    padding: 8px 20px; border-radius: 50px;
+    padding: 8px 18px; border-radius: 50px;
     border: 1px solid var(--border); background: var(--surf);
     color: var(--text2); font-size: 0.85rem; font-weight: 600;
     text-decoration: none; transition: all 0.15s;
@@ -33,7 +40,7 @@
   .site-nav a.active { background: var(--accent2); border-color: var(--accent); color: #fff; }
 
   /* Header */
-  .header { text-align: center; margin-bottom: 28px; }
+  .header { text-align: center; margin: 0 0 32px; padding-top: 4px; }
   .header h1 {
     font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;
     background: linear-gradient(135deg, var(--accent), var(--gold));
@@ -245,19 +252,19 @@
 </style>
 </head>
 <body>
-
-<div class="header">
-  <h1>📖 Methodology &amp; Glossary</h1>
-  <p>How every stat on this site is defined and calculated</p>
-</div>
-
+<div class="top-bar"></div>
 <nav class="site-nav">
+  <a class="brand" href="index.html">NHL WAR</a>
   <a href="index.html">Home</a>
   <a href="NHL_WAR_Cards.html">Players</a>
   <a href="NHL_WAR_Teams.html">Teams</a>
   <a href="NHL_WAR_Lines.html">Lines</a>
   <a href="NHL_WAR_About.html" class="active">About</a>
 </nav>
+<div class="header">
+  <h1>Methodology &amp; Glossary</h1>
+  <p>How every stat on this site is defined and calculated</p>
+</div>
 
 <div class="page-wrap">
 
