@@ -917,7 +917,7 @@ function renderSkaterCard(p) {
   return `
     <div class="player-card">
       <div class="card-header">
-        <div class="avatar">${initials(p.name)}<img src="https://assets.nhle.com/mugs/nhl/skater/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+        <div class="avatar">${initials(p.name)}<img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
         <div class="player-info">
           <h2>${p.name}</h2>
           <div class="player-meta">
@@ -1031,7 +1031,7 @@ function renderGoalieCard(p) {
   return `
     <div class="player-card">
       <div class="card-header">
-        <div class="avatar goalie">${initials(p.name)}<img src="https://assets.nhle.com/mugs/nhl/skater/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+        <div class="avatar goalie">${initials(p.name)}<img src="https://assets.nhle.com/mugs/nhl/${+p.season.split('-')[0]}${+p.season.split('-')[0]+1}/${p.team}/${p.playerId}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
         <div class="player-info">
           <h2>${p.name}</h2>
           <div class="player-meta">
