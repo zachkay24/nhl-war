@@ -333,26 +333,23 @@ function xgfHex(v)     { return v>=52?'#2dc653':v<=48?'#e63946':'#e2e8f0'; }
 function diffHex(d)    { return d>0?'#2dc653':d<0?'#e63946':'#e2e8f0'; }
 
 var TEAM_C={
-  ANA:'#F47A38',BOS:'#FFB81C',BUF:'#003087',CAR:'#CC0000',CBJ:'#002654',
-  CGY:'#C8102E',CHI:'#CF0A2C',COL:'#6F263D',DAL:'#006847',DET:'#CE1126',
-  EDM:'#FF4C00',FLA:'#C8102E',LAK:'#A2AAAD',MIN:'#A6192E',MTL:'#AF1E2D',
-  NJD:'#CE1126',NSH:'#FFB81C',NYI:'#00539B',NYR:'#0038A8',OTT:'#C52032',
-  PHI:'#F74902',PIT:'#CFC493',SEA:'#99D9D9',SJS:'#006D75',STL:'#002F87',
-  TBL:'#002868',TOR:'#00205B',UTA:'#69B3E7',VAN:'#00205B',VGK:'#B4975A',
-  WPG:'#041E42',WSH:'#C8102E'
+  ANA:'#F47A38',BOS:'#FFB81C',BUF:'#FCB514',CAR:'#FF3333',CBJ:'#FF3333',
+  CGY:'#E8102E',CHI:'#FF2030',COL:'#8B4060',DAL:'#00a85a',DET:'#FF2030',
+  EDM:'#FF4C00',FLA:'#E8102E',LAK:'#C0C8CF',MIN:'#C42030',MTL:'#CF2035',
+  NJD:'#FF2030',NSH:'#FFB81C',NYI:'#F47D30',NYR:'#4060CC',OTT:'#E04040',
+  PHI:'#FF5500',PIT:'#FFD580',SEA:'#99D9D9',SJS:'#00A8B0',STL:'#FCB514',
+  TBL:'#4080CC',TOR:'#4080CC',UTA:'#69B3E7',VAN:'#00b848',VGK:'#C4A870',
+  WPG:'#4080CC',WSH:'#E8102E'
 };
 var TEAM_BG={
-  ANA:'#F47A38,#B9975B',BOS:'#FFB81C,#1a1a1a',BUF:'#003087,#FCB514',
-  CAR:'#CC0000,#7a0000',CBJ:'#002654,#CE1126',CGY:'#C8102E,#F1BE48',
-  CHI:'#CF0A2C,#7a0000',COL:'#6F263D,#236192',DAL:'#006847,#004d35',
-  DET:'#CE1126,#7a0000',EDM:'#FF4C00,#041E42',FLA:'#041E42,#C8102E',
-  LAK:'#A2AAAD,#555',MIN:'#A6192E,#154734',MTL:'#AF1E2D,#192168',
-  NJD:'#CE1126,#7a0000',NSH:'#FFB81C,#041E42',NYI:'#00539B,#F47D30',
-  NYR:'#0038A8,#CE1126',OTT:'#C52032,#C69214',PHI:'#F74902,#7a2500',
-  PIT:'#CFC493,#555',SEA:'#99D9D9,#001628',SJS:'#006D75,#EA7200',
-  STL:'#002F87,#FCB514',TBL:'#002868,#0038a8',TOR:'#00205B,#003087',
-  UTA:'#69B3E7,#1C6fa0',VAN:'#00205B,#009639',VGK:'#B4975A,#333F48',
-  WPG:'#041E42,#004C97',WSH:'#C8102E,#041E42'
+  ANA:'F47A38,B9975B',BOS:'FFB81C,8a6600',BUF:'003087,FCB514',CAR:'CC0000,7a0000',
+  CBJ:'002654,CE1126',CGY:'C8102E,F1BE48',CHI:'CF0A2C,7a0000',COL:'6F263D,236192',
+  DAL:'006847,004d35',DET:'CE1126,7a0000',EDM:'FF4C00,041E42',FLA:'041E42,C8102E',
+  LAK:'444,888',MIN:'A6192E,154734',MTL:'AF1E2D,192168',NJD:'CE1126,7a0000',
+  NSH:'FFB81C,041E42',NYI:'00539B,F47D30',NYR:'0038A8,CE1126',OTT:'C52032,C69214',
+  PHI:'F74902,7a2500',PIT:'CFC493,888',SEA:'001628,99D9D9',SJS:'006D75,EA7200',
+  STL:'002F87,FCB514',TBL:'002868,0038a8',TOR:'00205B,003087',UTA:'1C6fa0,69B3E7',
+  VAN:'00205B,009639',VGK:'B4975A,333F48',WPG:'041E42,004C97',WSH:'C8102E,041E42'
 };
 function render() {
   const data = [...TEAMS].sort((a,b) => {
@@ -369,7 +366,7 @@ function render() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = data.map((r,i) => `<tr>
     <td class="sc1 rank-c">${i+1}</td>
-    <td class="sc2 name-c" style="color:${TEAM_C[r.team]||'inherit'};font-weight:800">${r.team}</td>
+    <td class="sc2 name-c" style="color:${TEAM_C[r.team]||'inherit'};font-weight:800;text-shadow:0 0 6px rgba(255,255,255,0.25),0 1px 3px rgba(0,0,0,0.8)">${r.team}</td>
     <td class="num grp-l">${r.gp}</td>
     <td class="num grp-l ${pCls(r.ev_xgf_pct)}">${n(r.ev_xgf_pct)}%</td>
     <td class="num ${pCls(r.ev_cf_pct)}">${n(r.ev_cf_pct)}%</td>
@@ -465,7 +462,7 @@ function renderTeamCard(r) {
   return `
   <div class="player-card">
     <div class="card-header">
-      <div class="avatar" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[0]},${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[1]})"><span style="display:none">${r.team}</span><img src="https://assets.nhle.com/logos/nhl/svg/${r.team}_light.svg" style="width:60%;height:60%;object-fit:contain;display:block" onerror="this.style.display=\'none\'"></div>
+      <div class="avatar" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[0]},${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[1]})"><span style="display:none">${r.team}</span><img src="https://assets.nhle.com/logos/nhl/svg/${r.team}_light.svg" style="width:90%;height:90%;object-fit:contain;display:block" onerror="this.style.display=\'none\'"></div>
       <div class="player-info">
         <h2>${r.team}</h2>
         <div class="player-meta">

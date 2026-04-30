@@ -322,7 +322,7 @@ function render() {
   tbody.innerHTML=data.map((r,i)=>`<tr style="cursor:pointer">
     <td class="sc1 rank-c">${i+1}</td>
     <td class="sc2 name-c">${esc(r.name)}</td>
-    <td class="sc3" style="color:${TEAM_C[r.team]||'inherit'};font-weight:800">${esc(r.team)}</td>
+    <td class="sc3" style="color:${TEAM_C[r.team]||'inherit'};font-weight:800;text-shadow:0 0 6px rgba(255,255,255,0.25),0 1px 3px rgba(0,0,0,0.8)">${esc(r.team)}</td>
     <td class="sc4"><span class="badge badge-${r.pos}">${r.pos==='line'?'Line':'Pairing'}</span></td>
     <td class="num grp-l">${r.gp}</td>
     <td class="num">${r.toi_min.toFixed(0)} min</td>
@@ -380,7 +380,7 @@ function showCard(r) {
         <h2>${esc(r.name)}</h2>
         <div class="player-meta">
           <span class="meta-b"><span class="badge badge-${r.pos}">${r.pos==='line'?'Line':'Pairing'}</span></span>
-          <span class="meta-b" style="border-color:${TEAM_C[r.team]||'var(--border)'};color:${TEAM_C[r.team]||'var(--text2)'}">${esc(r.team)}</span>
+          <span class="meta-b" style="border-color:${TEAM_C[r.team]||'var(--border)'};color:${TEAM_C[r.team]||'var(--text2)'};text-shadow:0 0 6px rgba(255,255,255,0.25),0 1px 3px rgba(0,0,0,0.8)">${esc(r.team)}</span>
           <span class="meta-b">${r.gp} GP</span>
           <span class="meta-b">${r.toi_min.toFixed(0)} min TOI</span>
           <span class="meta-b">5-on-5</span>
