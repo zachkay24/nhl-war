@@ -462,7 +462,7 @@ function renderTeamCard(r) {
   return `
   <div class="player-card">
     <div class="card-header">
-      <div class="avatar" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[0]},${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[1]})"><span style="display:none">${r.team}</span><img src="https://assets.nhle.com/logos/nhl/svg/${r.team}_light.svg" style="width:90%;height:90%;object-fit:contain;display:block" onerror="this.style.display=\'none\'"></div>
+      <div class="avatar" style="background:linear-gradient(135deg,${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[0]},${'#'+(TEAM_BG[r.team]||'0077b6,00b4d8').split(',')[1]})"><span style="display:none">${r.team}</span><img src="https://assets.nhle.com/logos/nhl/svg/${r.team}_light.svg" style="width:112%;height:112%;object-fit:contain;display:block;margin:-6% 0 0 -6%" onerror="this.style.display=\'none\'"></div>
       <div class="player-info">
         <h2>${r.team}</h2>
         <div class="player-meta">
